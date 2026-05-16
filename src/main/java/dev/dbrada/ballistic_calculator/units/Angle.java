@@ -9,6 +9,8 @@ public class Angle {
     private double value;
     private EAngle unit;
     private EAngle[] allowed;
+    private Angle min;
+    private Angle max;
 
     public Angle(double value, EAngle unit) {
         this.value = value;

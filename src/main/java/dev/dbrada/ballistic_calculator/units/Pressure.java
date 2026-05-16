@@ -9,6 +9,8 @@ public class Pressure {
     private double value;
     private EPressure unit;
     private EPressure[] allowed;
+    private Pressure min;
+    private Pressure max;
 
     public Pressure(double value, EPressure unit) {
         this.value = value;

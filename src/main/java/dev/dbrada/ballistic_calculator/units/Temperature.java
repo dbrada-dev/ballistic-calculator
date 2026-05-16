@@ -9,6 +9,8 @@ public class Temperature {
     private double value;
     private ETemperature unit;
     private ETemperature[] allowed;
+    private Temperature min;
+    private Temperature max;
 
     public Temperature(double value, ETemperature unit) {
         this.value = value;

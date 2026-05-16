@@ -9,6 +9,8 @@ public class Lenght {
     private double value;
     private ELenght unit;
     private ELenght[] allowed;
+    private Lenght min;
+    private Lenght max;
 
     public Lenght(double value, ELenght unit) {
         this.value = value;

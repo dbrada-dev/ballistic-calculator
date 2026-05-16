@@ -9,6 +9,8 @@ public class Mass {
     private double value;
     private EMass unit;
     private EMass[] allowed;
+    private Mass min;
+    private Mass max;
 
     public Mass(double value, EMass unit) {
         this.value = value;

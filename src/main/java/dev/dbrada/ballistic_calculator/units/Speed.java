@@ -8,6 +8,13 @@ import lombok.Data;
 public class Speed {
     private double value;
     private ESpeed unit;
+    private Speed min;
+    private Speed max;
+
+    public Speed(double value, ESpeed unit) {
+        this.value = value;
+        this.unit = unit;
+    }
 
     public double getMPS() {
         return switch(unit) {
