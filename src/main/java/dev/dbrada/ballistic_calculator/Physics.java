@@ -4,83 +4,81 @@ import dev.dbrada.ballistic_calculator.units.*;
 
 import java.io.*;
 import java.util.*;
-
+//TODO write integration loop and zero angle calculator
 public class Physics {
     private final Parameters param;
 
-    private final Pressure saturationVaporPressure;
     private final Pressure vaporPressure;
-    private final double airDensityKGPM3; //
+    private final double airDensityKGPM3;
     private final Speed speedOfSound;
-    private final double frontalAreaM2; //
-    private final double sectionalDensityLBPIN2;
-    private final double formFactor; //
-    private final double bulletLengthCAL;
-    private final double twistRateCAL;
+    private final double frontalAreaM2;
+    private final double formFactor;
     private final double stabilityFactor;
-    private final double stabilityDensityCorrection;
-
     /**
      * First [] -> keys; second [] -> values
      */
     private final double[][] dragCoefStd;
-    /**
-     * -1 -> lower than index 0
-     */
-    private int previousDragCoefIndex;
 
     public Physics(Parameters param) {
         this.param = param;
-        this.saturationVaporPressure = saturationVaporPressure();
         this.vaporPressure = vaporPressure();
+        this.airDensityKGPM3 = airDensityKGPM3();
         this.speedOfSound = speedOfSound();
         this.frontalAreaM2 = frontalAreaM2();
-        this.sectionalDensityLBPIN2 = sectionalDensityLBPIN2();
         this.formFactor = formFactor();
-        this.bulletLengthCAL = bulletLengthCAL();
-        this.airDensityKGPM3 = airDensityKGPM3();
-        this.dragCoefStd = dragCoefStd();
-        this.previousDragCoefIndex = initializePrevDragCoefIndex();
-        this.twistRateCAL = twistRateCAL();
         this.stabilityFactor = stabilityFactor();
-        this.stabilityDensityCorrection = stabilityDensityCorrection();
+        this.dragCoefStd = dragCoefStd();
     }
 
-    private double dragDeceleration(double velocityMPS) {
-        return (airDensityKGPM3 * velocityMPS * velocityMPS * (frontalAreaM2 * (formFactor * getDragCoef(velocityMPS))))/(2*param.getMass().getKG());
+//█ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
+//█ █░▀█ ░█░ ██▄ █▄█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
+    private double dragDeceleration(double velocityMPS, int[] prevIndex) {
+        return (airDensityKGPM3 * velocityMPS * velocityMPS * (frontalAreaM2 * (formFactor * getDragCoef(velocityMPS, prevIndex))))/(2*param.getMass().getKG());
     }
 
-    private double getDragCoef(double velocityMPS) {
+    private double getDragCoef(double velocityMPS, int[] prevIndex) {
         double mach = machNumber(velocityMPS);
-        if(previousDragCoefIndex == -1) {
-            if(mach < dragCoefStd[0][0]) {
-                return dragCoefStd[1][1];
-            } else previousDragCoefIndex++;
-        } else if (previousDragCoefIndex == dragCoefStd[0].length - 1) {
-            if (mach > dragCoefStd[0][dragCoefStd[0].length-1]) {
-                return dragCoefStd[1][dragCoefStd[0].length-1];
-            } else previousDragCoefIndex--;
+        int i = prevIndex[0];
+        double[] machNodes = dragCoefStd[0];
+        double[] cdValues = dragCoefStd[1];
+        int maxIndex = machNodes.length - 1;
+
+        if (mach <= machNodes[0]) {
+            prevIndex[0] = -1;
+            return cdValues[0];
         }
-        if (mach >= dragCoefStd[0][previousDragCoefIndex]) {
-            for (int i = previousDragCoefIndex; i < dragCoefStd.length-1; i++) {
-                if (mach > dragCoefStd[0][i] && mach < dragCoefStd[0][i + 1]) {
-                    previousDragCoefIndex = i;
-                    return linearInterpolation(dragCoefStd[0][i], dragCoefStd[1][i], dragCoefStd[0][i + 1], dragCoefStd[1][i + 1], mach);
-                }
+        if (mach >= machNodes[maxIndex]) {
+            prevIndex[0] = maxIndex;
+            return cdValues[maxIndex];
+        }
+
+        if (i >= 0 && i < maxIndex) {
+            if (mach >= machNodes[i] && mach < machNodes[i + 1]) {
+                return dragLinearInterpolation(machNodes[i], cdValues[i], machNodes[i + 1], cdValues[i + 1], mach);
             }
+            if (i > 0 && mach >= machNodes[i - 1] && mach < machNodes[i]) {
+                prevIndex[0] = i - 1;
+                return dragLinearInterpolation(machNodes[i - 1], cdValues[i - 1], machNodes[i], cdValues[i], mach);
+            }
+            if (i + 2 <= maxIndex && mach >= machNodes[i + 1] && mach < machNodes[i + 2]) {
+                prevIndex[0] = i + 1;
+                return dragLinearInterpolation(machNodes[i + 1], cdValues[i + 1], machNodes[i + 2], cdValues[i + 2], mach);
+            }
+        }
+
+        int index = Arrays.binarySearch(machNodes, mach);
+        if (index >= 0) {
+            prevIndex[0] = index;
+            return cdValues[index];
         } else {
-            for (int i = previousDragCoefIndex; i > 0; i--) {
-                if (mach < dragCoefStd[0][i] && mach >= dragCoefStd[0][i - 1]) {
-                    previousDragCoefIndex = i-1;
-                    return linearInterpolation(dragCoefStd[0][i - 1], dragCoefStd[1][i - 1], dragCoefStd[0][i], dragCoefStd[1][i], mach);
-                }
-            }
+            int lowIndex = -index - 2;
+            prevIndex[0] = lowIndex;
+            return dragLinearInterpolation(machNodes[lowIndex], cdValues[lowIndex], machNodes[lowIndex + 1], cdValues[lowIndex + 1], mach);
         }
-        throw new IllegalStateException("Drag Coefficient for mach number " + mach + " at " + velocityMPS + "m/s could not be found");
     }
 
 
-    private double linearInterpolation(double low, double lowValue, double high, double highValue, double point) {
+    private double dragLinearInterpolation(double low, double lowValue, double high, double highValue, double point) {
         if (high == low) return lowValue;
         return lowValue + (point-low)*(highValue-lowValue)/(high-low);
     }
@@ -89,14 +87,18 @@ public class Physics {
         return velocityMPS/speedOfSound.getMPS();
     }
 
-
-    private Pressure saturationVaporPressure() {
-        double value = Constants.SATURATION_WATER_PRESSURE * Math.exp(Constants.EMPIRICAL_WATER_VAPOR_CONSTANT*param.getTemperature().getC()/(Constants.TEMPERATURE_SCALING_CONSTANT+param.getTemperature().getC()));
-        return new Pressure(value, Pressure.EPressure.PA);
+//█▀█ █▀█ █▀ ▀█▀ ▄▄ █ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
+//█▀▀ █▄█ ▄█ ░█░ ░░ █ █░▀█ ░█░ ██▄ █▄█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
+    private Lenght spinDrift(double timeS) {
+        double value = 1.25*(stabilityFactor + 1.2)*Math.pow(timeS, 1.83);
+        return new Lenght(value, Lenght.ELenght.IN);
     }
 
+//█▀▀ ▀▄▀ █▀▀ █▀▀ ▄▄ █▀█ █▄░█ █▀▀ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
+//██▄ █░█ ██▄ █▄▄ ░░ █▄█ █░▀█ █▄▄ ██▄  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
     private Pressure vaporPressure() {
-        double value = param.getHumidity()/100 * saturationVaporPressure.getPA();
+        double saturationVaporPressure = Constants.SATURATION_WATER_PRESSURE * Math.exp(Constants.EMPIRICAL_WATER_VAPOR_CONSTANT*param.getTemperature().getC()/(Constants.TEMPERATURE_SCALING_CONSTANT+param.getTemperature().getC()));
+        double value = param.getHumidity()/100 * saturationVaporPressure;
         return new Pressure(value, Pressure.EPressure.PA);
     }
 
@@ -114,28 +116,18 @@ public class Physics {
         return Math.PI * param.getDiameter().getM()*param.getDiameter().getM()/4;
     }
 
-    private double sectionalDensityLBPIN2() {
-        return param.getMass().getLB()/(param.getDiameter().getIN()*param.getDiameter().getIN());
-    }
-
     private double formFactor() {
+        double sectionalDensityLBPIN2 = param.getMass().getLB()/(param.getDiameter().getIN()*param.getDiameter().getIN());
         return sectionalDensityLBPIN2/param.getBalCoef().getValue();
     }
 
-    private double bulletLengthCAL() {
-        return param.getMass().getKG()/(Constants.BULLET_VOLUME_FACTOR*Constants.BULLET_DENSITY*frontalAreaM2)/param.getDiameter().getM();
-    }
-
-    private double twistRateCAL() {
-        return param.getTwistRate().getM()/param.getDiameter().getM();
-    }
-
     private double stabilityFactor() {
-        return 30*param.getMass().getGR()/(twistRateCAL*twistRateCAL*param.getDiameter().getIN()*param.getDiameter().getIN()*param.getDiameter().getIN()*bulletLengthCAL*(1+bulletLengthCAL*bulletLengthCAL));
-    }
-
-    private double stabilityDensityCorrection() {
-        return Constants.SEA_LEVEL_AIR_DENSITY*airDensityKGPM3;
+        double bulletLengthCAL = param.getMass().getKG()/(Constants.BULLET_VOLUME_FACTOR*Constants.BULLET_DENSITY*frontalAreaM2)/param.getDiameter().getM();
+        double twistRateCAL = param.getTwistRate().getM()/param.getDiameter().getM();
+        double fixedStabilityFactor = 30*param.getMass().getGR()/(twistRateCAL*twistRateCAL*param.getDiameter().getIN()*param.getDiameter().getIN()*param.getDiameter().getIN()*bulletLengthCAL*(1+bulletLengthCAL*bulletLengthCAL));
+        double densityCorrection = Constants.SEA_LEVEL_AIR_DENSITY/airDensityKGPM3;
+        double velocityCorrection = Math.cbrt(param.getVelocity().getFPS()/2800);
+        return fixedStabilityFactor*densityCorrection*velocityCorrection;
     }
 
     private double[][] dragCoefStd() {
@@ -159,30 +151,8 @@ public class Physics {
         }
     }
 
-    private int initializePrevDragCoefIndex() {
-        double mach = machNumber(param.getVelocity().getMPS());
-        if (mach > dragCoefStd[0][dragCoefStd[0].length - 1]) {
-            return previousDragCoefIndex = dragCoefStd[0].length-1;
-        } else if (mach < dragCoefStd[0][0]) {
-            return previousDragCoefIndex = -1;
-        } else {
-            if (mach < dragCoefStd[0][dragCoefStd[0].length / 2]) {
-                for (int i = dragCoefStd[0].length / 2; i > 0; i--) {
-                    if (mach < dragCoefStd[0][i] && mach >= dragCoefStd[0][i - 1]) {
-                        return previousDragCoefIndex = i-1;
-                    }
-                }
-            } else {
-                for (int i = dragCoefStd[0].length / 2; i < dragCoefStd[0].length - 1; i++) {
-                    if (mach > dragCoefStd[0][i] && mach < dragCoefStd[0][i + 1]) {
-                        return previousDragCoefIndex = i;
-                    }
-                }
-            }
-        }
-        throw new IllegalStateException("Drag Coefficient for mach number " + mach + " at " + param.getVelocity().getMPS() + "m/s could not be found");
-    }
-
+//█▀█ █░█ █▄▄ █░░ █ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
+//█▀▀ █▄█ █▄█ █▄▄ █ █▄▄  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
     public static Pressure calculatePressure(Lenght altitude) {
         double value = Constants.SEA_LEVEL_PRESSURE * Math.pow(1.0-Constants.TEMPERATURE_LAPS_RATE*altitude.getM()/Constants.SEA_LEVEL_TEMPERATURE, Constants.GRAVITY*Constants.AIR_MOLAR_MASS/(Constants.GAS_CONSTANT*Constants.TEMPERATURE_LAPS_RATE));
         return new Pressure(value, Pressure.EPressure.PA);
