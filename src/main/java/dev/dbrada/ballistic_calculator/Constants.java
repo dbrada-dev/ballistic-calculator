@@ -2,6 +2,10 @@ package dev.dbrada.ballistic_calculator;
 
 public class Constants {
     /**
+     * Integration interval <= 0.001s is considered precise enough
+     */
+    public static final double TIME_STEP = 0.001;
+    /**
      * Acceleration due to gravity (g) [m/s^2]
      */
     public static final double GRAVITY = 9.80665;

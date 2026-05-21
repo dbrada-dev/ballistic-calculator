@@ -1,12 +1,16 @@
 package dev.dbrada.ballistic_calculator;
 
 import dev.dbrada.ballistic_calculator.units.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.io.*;
 import java.util.*;
-//TODO write integration loop and zero angle calculator
+//TODO test this
+@Data
+@AllArgsConstructor
 public class Physics {
-    private final Parameters param;
+    private Parameters param;
 
     private final Pressure vaporPressure;
     private final double airDensityKGPM3;
@@ -18,6 +22,7 @@ public class Physics {
      * First [] -> keys; second [] -> values
      */
     private final double[][] dragCoefStd;
+    private double angleOfDepartureRAD;
 
     public Physics(Parameters param) {
         this.param = param;
@@ -28,6 +33,72 @@ public class Physics {
         this.formFactor = formFactor();
         this.stabilityFactor = stabilityFactor();
         this.dragCoefStd = dragCoefStd();
+        this.angleOfDepartureRAD = angleOfDepartureRAD();
+    }
+
+    private static LinkedList<double[]> positionIntegration(Physics p) {
+        //0-X,1-Y,2-Z
+        double[] pos = new double[]{0,0,0};
+        double[] velocity = new double[]{
+                p.param.getVelocity().getMPS()*Math.cos(p.angleOfDepartureRAD),
+                p.param.getVelocity().getMPS()*Math.sin(p.angleOfDepartureRAD),
+                0
+        };
+        //0-X,1-Z
+        double[] wind = new double[]{
+                p.param.getWindSpeed().getMPS()*Math.cos(p.param.getWindAzimuth().getRAD()),
+                p.param.getWindSpeed().getMPS()*Math.sin(p.param.getWindAzimuth().getRAD())
+        };
+        //0-X,1-Y
+        double[] gravity = new double[]{
+                Constants.GRAVITY*Math.sin(p.param.getShotAngle().getRAD()),
+                Constants.GRAVITY*Math.cos(p.param.getShotAngle().getRAD())
+        };
+
+        int[] prevIndex = new int[]{-2};
+        int i = 0;
+        double nextTarget = p.param.getRangeStep().getM();
+
+        LinkedList<double[]> result = new LinkedList<>();
+
+        do {
+            double[] vApp = new double[]{
+                    velocity[0]+wind[0],
+                    velocity[1],
+                    velocity[2]+wind[1]
+            };
+
+            double vAppAbs = Math.sqrt(vApp[0]*vApp[0]+vApp[1]*vApp[1]+vApp[2]*vApp[2]);
+            double drag = p.dragDeceleration(vAppAbs, prevIndex);
+
+            double[] acceleration = new double[]{
+                    -drag * vApp[0]/vAppAbs - gravity[0],
+                    -drag * vApp[1]/vAppAbs - gravity[1],
+                    -drag * vApp[2]/vAppAbs
+            };
+
+            pos[0] += velocity[0]*Constants.TIME_STEP + 0.5*acceleration[0]*Constants.TIME_STEP*Constants.TIME_STEP;
+            pos[1] += velocity[1]*Constants.TIME_STEP + 0.5*acceleration[1]*Constants.TIME_STEP*Constants.TIME_STEP;
+            pos[2] += velocity[2]*Constants.TIME_STEP + 0.5*acceleration[2]*Constants.TIME_STEP*Constants.TIME_STEP;
+
+            velocity[0] += acceleration[0] * Constants.TIME_STEP;
+            velocity[1] += acceleration[1] * Constants.TIME_STEP;
+            velocity[2] += acceleration[2] * Constants.TIME_STEP;
+
+            i++;
+            double currentTime = i * Constants.TIME_STEP;
+
+            while (pos[0] > nextTarget) {
+                result.add(new double[]{
+                        nextTarget, currentTime,
+                        pos[0],pos[1]-p.param.getSightHeight().getM(),pos[2]+p.spinDrift(currentTime).getM(),
+                        velocity[0],velocity[1],velocity[2]
+                });
+                nextTarget += p.param.getRangeStep().getM();
+            }
+        } while (pos[0]<p.param.getMaxRange().getM());
+
+        return result;
     }
 
 //█ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
@@ -151,10 +222,47 @@ public class Physics {
         }
     }
 
+    private double angleOfDepartureRAD() {
+        Parameters p = param.copy();
+        p.setMaxRange(param.getZeroRange());
+        p.setRangeStep(param.getZeroRange());
+        Physics estimationEnv = this.copy();
+        estimationEnv.setParam(p);
+
+        double prevEstimatedAngleRAD = Math.atan(param.getSightHeight().getM() / param.getZeroRange().getM());
+        estimationEnv.setAngleOfDepartureRAD(prevEstimatedAngleRAD);
+        double prevError = positionIntegration(estimationEnv).getFirst()[3];
+
+        double estimatedAngleRAD = prevEstimatedAngleRAD + Math.asin((Constants.GRAVITY * param.getZeroRange().getM())/(param.getVelocity().getMPS() * param.getVelocity().getMPS()));
+        estimationEnv.setAngleOfDepartureRAD(estimatedAngleRAD);
+        double error;
+
+        int i = 0;
+
+        while(true) {
+            error = positionIntegration(estimationEnv).getFirst()[3];
+            if (Math.abs(error) < 0.0001) {
+                return estimatedAngleRAD;
+            }
+            i++;
+            if(i > 2000) throw new IllegalStateException("Zero angle could not been found");
+
+            double tmp = estimatedAngleRAD;
+            estimatedAngleRAD -= error*(estimatedAngleRAD - prevEstimatedAngleRAD)/(error - prevError);
+            prevEstimatedAngleRAD = tmp;
+            prevError = error;
+            estimationEnv.setAngleOfDepartureRAD(estimatedAngleRAD);
+        }
+    }
+
 //█▀█ █░█ █▄▄ █░░ █ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█▀▀ █▄█ █▄█ █▄▄ █ █▄▄  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
     public static Pressure calculatePressure(Lenght altitude) {
         double value = Constants.SEA_LEVEL_PRESSURE * Math.pow(1.0-Constants.TEMPERATURE_LAPS_RATE*altitude.getM()/Constants.SEA_LEVEL_TEMPERATURE, Constants.GRAVITY*Constants.AIR_MOLAR_MASS/(Constants.GAS_CONSTANT*Constants.TEMPERATURE_LAPS_RATE));
         return new Pressure(value, Pressure.EPressure.PA);
+    }
+
+    public Physics copy() {
+        return new Physics(param, vaporPressure, airDensityKGPM3, speedOfSound, frontalAreaM2, formFactor, stabilityFactor, dragCoefStd, angleOfDepartureRAD);
     }
 }
