@@ -17,6 +17,20 @@ public class Pressure {
         this.unit = unit;
     }
 
+    public double get(EPressure targetUnit) {
+        return switch(targetUnit) {
+            case PA -> getPA();
+            case HPA -> getHPA();
+            case KPA -> getKPA();
+        };
+    }
+
+    public double get(EPressure targetUnit, int decimals) {
+        if (decimals < 0) return get(targetUnit);
+        double round = Math.pow(10, decimals);
+        return Math.round(get(targetUnit) * round)/round;
+    }
+
     public double getPA() {
         return switch(unit) {
             case PA -> value;

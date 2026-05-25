@@ -7,14 +7,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Parameters {
-    private Lenght diameter;
+    private Length diameter;
     private Mass mass;
     private Speed velocity;
     private BallisticCoefficient balCoef;
 
-    private Lenght zeroRange;
-    private Lenght sightHeight;
-    private Lenght twistRate;
+    private Length zeroRange;
+    private Length sightHeight;
+    private Length twistRate;
 
     private Temperature temperature;
     private double humidity;
@@ -24,8 +24,8 @@ public class Parameters {
 
     private Angle shotAngle;
 
-    private Lenght maxRange;
-    private Lenght rangeStep;
+    private Length maxRange;
+    private Length rangeStep;
 
     public Parameters copy(){
         return new Parameters(diameter, mass, velocity, balCoef, zeroRange, sightHeight, twistRate, temperature, humidity, windSpeed, windAzimuth, pressure, shotAngle, maxRange, rangeStep);

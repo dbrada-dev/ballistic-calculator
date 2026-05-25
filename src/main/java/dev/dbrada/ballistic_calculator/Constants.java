@@ -4,7 +4,7 @@ public class Constants {
     /**
      * Integration interval <= 0.001s is considered precise enough
      */
-    public static final double TIME_STEP = 0.001;
+    public static final double TIME_STEP = 0.0001;
     /**
      * Acceleration due to gravity (g) [m/s^2]
      */

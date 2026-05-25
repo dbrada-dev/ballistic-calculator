@@ -6,7 +6,7 @@ import lombok.Data;
 
 import java.io.*;
 import java.util.*;
-//TODO test this
+
 @Data
 @AllArgsConstructor
 public class Physics {
@@ -36,7 +36,7 @@ public class Physics {
         this.angleOfDepartureRAD = angleOfDepartureRAD();
     }
 
-    private static LinkedList<double[]> positionIntegration(Physics p) {
+    public static LinkedList<double[]> positionIntegration(Physics p) {
         //0-X,1-Y,2-Z
         double[] pos = new double[]{0,0,0};
         double[] velocity = new double[]{
@@ -160,9 +160,9 @@ public class Physics {
 
 //█▀█ █▀█ █▀ ▀█▀ ▄▄ █ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█▀▀ █▄█ ▄█ ░█░ ░░ █ █░▀█ ░█░ ██▄ █▄█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
-    private Lenght spinDrift(double timeS) {
-        double value = 1.25*(stabilityFactor + 1.2)*Math.pow(timeS, 1.83);
-        return new Lenght(value, Lenght.ELenght.IN);
+    private Length spinDrift(double timeS) {
+        double value = Math.signum(param.getTwistRate().getValue()) * 1.25*(stabilityFactor + 1.2)*Math.pow(timeS, 1.83);
+        return new Length(value, Length.ELength.IN);
     }
 
 //█▀▀ ▀▄▀ █▀▀ █▀▀ ▄▄ █▀█ █▄░█ █▀▀ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
@@ -193,6 +193,7 @@ public class Physics {
     }
 
     private double stabilityFactor() {
+        if (param.getTwistRate().getValue() == 0) return 0;
         double bulletLengthCAL = param.getMass().getKG()/(Constants.BULLET_VOLUME_FACTOR*Constants.BULLET_DENSITY*frontalAreaM2)/param.getDiameter().getM();
         double twistRateCAL = param.getTwistRate().getM()/param.getDiameter().getM();
         double fixedStabilityFactor = 30*param.getMass().getGR()/(twistRateCAL*twistRateCAL*param.getDiameter().getIN()*param.getDiameter().getIN()*param.getDiameter().getIN()*bulletLengthCAL*(1+bulletLengthCAL*bulletLengthCAL));
@@ -257,7 +258,7 @@ public class Physics {
 
 //█▀█ █░█ █▄▄ █░░ █ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█▀▀ █▄█ █▄█ █▄▄ █ █▄▄  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
-    public static Pressure calculatePressure(Lenght altitude) {
+    public static Pressure calculatePressure(Length altitude) {
         double value = Constants.SEA_LEVEL_PRESSURE * Math.pow(1.0-Constants.TEMPERATURE_LAPS_RATE*altitude.getM()/Constants.SEA_LEVEL_TEMPERATURE, Constants.GRAVITY*Constants.AIR_MOLAR_MASS/(Constants.GAS_CONSTANT*Constants.TEMPERATURE_LAPS_RATE));
         return new Pressure(value, Pressure.EPressure.PA);
     }

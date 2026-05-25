@@ -11,8 +11,8 @@ public class BallisticCoefficient {
     private EBallisticCoefficient type;
 
     public enum EBallisticCoefficient {
-        G1 ("g1_dragCoefStd.csv"),
-        G7 ("g7_dragCoefStd.csv");
+        G1 ("src/main/resources/g1_dragCoefStd.csv"),
+        G7 ("src/main/resources/g7_dragCoefStd.csv");
 
         @Getter
         private final String resource;

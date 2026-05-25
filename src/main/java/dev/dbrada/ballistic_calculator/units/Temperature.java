@@ -17,11 +17,25 @@ public class Temperature {
         this.unit = unit;
     }
 
+    public double get(ETemperature targetUnit) {
+        return switch(targetUnit) {
+            case C -> getC();
+            case K -> getK();
+            case F -> getF();
+        };
+    }
+
+    public double get(ETemperature targetUnit, int decimals) {
+        if (decimals < 0) return get(targetUnit);
+        double round = Math.pow(10, decimals);
+        return Math.round(get(targetUnit) * round)/round;
+    }
+
     public double getC() {
         return switch(unit) {
             case C -> value;
             case K -> value - 273.15;
-            case F -> (value - 32) * 5/9;
+            case F -> (value - 32) * 5/9.0;
         };
     }
 
@@ -29,7 +43,7 @@ public class Temperature {
         return switch(unit) {
             case C -> value + 273.15;
             case K -> value;
-            case F -> (value - 32) * 5/9 + 273.15;
+            case F -> (value - 32) * 5/9.0 + 273.15;
         };
     }
 
