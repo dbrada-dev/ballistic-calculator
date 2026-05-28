@@ -1,6 +1,8 @@
 package dev.dbrada.ballistic_calculator;
 
+import dev.dbrada.ballistic_calculator.gui.Menu;
 import dev.dbrada.ballistic_calculator.units.*;
+import javafx.application.Application;
 
 import java.util.LinkedList;
 
@@ -8,6 +10,7 @@ public class Main {
     static void main() {
         test1();
         test2();
+        Application.launch(Menu.class);
     }
 
     //test of FMJ Boat-Tail 55gr 5.56x45mm, resulting in < 1% deviation from www.federalpremium.com/ballistics-calculator (federal does not use humidity, twist rate and wind azimuth)

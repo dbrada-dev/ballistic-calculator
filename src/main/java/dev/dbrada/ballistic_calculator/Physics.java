@@ -203,8 +203,9 @@ public class Physics {
     }
 
     private double[][] dragCoefStd() {
-        try {
-            BufferedReader rd = new BufferedReader(new FileReader(param.getBalCoef().getType().getResource()));
+        try(InputStream in = getClass().getResourceAsStream(param.getBalCoef().getType().getResource())) {
+            if (in == null) throw new IOException("No resource found");
+            BufferedReader rd = new BufferedReader(new InputStreamReader(in));
             String line;
             ArrayList<Double> keys = new ArrayList<>();
             ArrayList<Double> values = new ArrayList<>();

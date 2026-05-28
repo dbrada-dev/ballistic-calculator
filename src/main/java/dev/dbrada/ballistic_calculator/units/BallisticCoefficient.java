@@ -10,15 +10,13 @@ public class BallisticCoefficient {
     private double value;
     private EBallisticCoefficient type;
 
+    @Getter
+    @AllArgsConstructor
     public enum EBallisticCoefficient {
-        G1 ("src/main/resources/g1_dragCoefStd.csv"),
-        G7 ("src/main/resources/g7_dragCoefStd.csv");
+        G1 ("/g1_dragCoefStd.csv", "G1"),
+        G7 ("/g7_dragCoefStd.csv", "G7");
 
-        @Getter
         private final String resource;
-
-        EBallisticCoefficient(String resource) {
-            this.resource = resource;
-        }
+        private final String name;
     }
 }

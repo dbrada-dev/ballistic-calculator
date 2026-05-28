@@ -2,20 +2,13 @@ package dev.dbrada.ballistic_calculator.units;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 public class Angle {
     private double value;
     private EAngle unit;
-    private EAngle[] allowed;
-    private Angle min;
-    private Angle max;
-
-    public Angle(double value, EAngle unit) {
-        this.value = value;
-        this.unit = unit;
-    }
 
     public double get(EAngle targetUnit) {
         return switch(targetUnit) {
@@ -68,7 +61,15 @@ public class Angle {
         };
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum EAngle {
-        DEG, RAD, MOA, MRAD
+        DEG("deg"),
+        RAD("rad"),
+        MOA("MOA"),
+        MRAD("MIL");
+
+        private final String name;
+
     }
 }

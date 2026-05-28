@@ -2,19 +2,13 @@ package dev.dbrada.ballistic_calculator.units;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 public class Speed {
     private double value;
     private ESpeed unit;
-    private Speed min;
-    private Speed max;
-
-    public Speed(double value, ESpeed unit) {
-        this.value = value;
-        this.unit = unit;
-    }
 
     public double get(ESpeed targetUnit) {
         return switch(targetUnit) {
@@ -68,7 +62,14 @@ public class Speed {
         };
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum ESpeed {
-        MPS, FPS, KMPH, MPH
+        MPS("m/s"),
+        FPS("fps"),
+        KMPH("km/h"),
+        MPH("mph");
+
+        private final String name;
     }
 }

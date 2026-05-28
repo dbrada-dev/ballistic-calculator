@@ -2,20 +2,13 @@ package dev.dbrada.ballistic_calculator.units;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 public class Pressure {
     private double value;
     private EPressure unit;
-    private EPressure[] allowed;
-    private Pressure min;
-    private Pressure max;
-
-    public Pressure(double value, EPressure unit) {
-        this.value = value;
-        this.unit = unit;
-    }
 
     public double get(EPressure targetUnit) {
         return switch(targetUnit) {
@@ -55,7 +48,13 @@ public class Pressure {
         };
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum EPressure {
-        PA, HPA, KPA
+        PA("Pa"),
+        HPA("hPa"),
+        KPA("kPa");
+
+        private final String name;
     }
 }

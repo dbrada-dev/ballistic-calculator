@@ -2,20 +2,13 @@ package dev.dbrada.ballistic_calculator.units;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 public class Temperature {
     private double value;
     private ETemperature unit;
-    private ETemperature[] allowed;
-    private Temperature min;
-    private Temperature max;
-
-    public Temperature(double value, ETemperature unit) {
-        this.value = value;
-        this.unit = unit;
-    }
 
     public double get(ETemperature targetUnit) {
         return switch(targetUnit) {
@@ -55,7 +48,13 @@ public class Temperature {
         };
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum ETemperature {
-        C, K, F
+        C("°C"),
+        K("K"),
+        F("°F");
+
+        private final String name;
     }
 }

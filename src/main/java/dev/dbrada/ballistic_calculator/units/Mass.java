@@ -2,20 +2,13 @@ package dev.dbrada.ballistic_calculator.units;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 public class Mass {
     private double value;
     private EMass unit;
-    private EMass[] allowed;
-    private Mass min;
-    private Mass max;
-
-    public Mass(double value, EMass unit) {
-        this.value = value;
-        this.unit = unit;
-    }
 
     public double get(EMass targetUnit) {
         return switch(targetUnit) {
@@ -68,7 +61,14 @@ public class Mass {
         };
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum EMass {
-        G, KG, GR, LB
+        G("g"),
+        KG("kg"),
+        GR("gr"),
+        LB("lb");
+
+        private final String name;
     }
 }

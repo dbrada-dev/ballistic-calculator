@@ -2,20 +2,13 @@ package dev.dbrada.ballistic_calculator.units;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 public class Length {
     private double value;
     private ELength unit;
-    private ELength[] allowed;
-    private Length min;
-    private Length max;
-
-    public Length(double value, ELength unit) {
-        this.value = value;
-        this.unit = unit;
-    }
 
     public double get(ELength targetUnit) {
         return switch(targetUnit) {
@@ -100,7 +93,16 @@ public class Length {
         };
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum ELength {
-        MM, CM, M, IN, FT, YD
+        MM("mm"),
+        CM("cm"),
+        M("m"),
+        IN("in"),
+        FT("ft"),
+        YD("yd");
+
+        private final String name;
     }
 }
