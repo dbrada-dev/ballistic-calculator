@@ -1,6 +1,6 @@
 package dev.dbrada.ballistic_calculator;
 
-public class Constants {
+public abstract class Constants {
     /**
      * Integration interval <= 0.001s is considered precise enough
      */
@@ -54,7 +54,7 @@ public class Constants {
      */
     public static final double AIR_GAS_CONSTANT = 287.05;
     /**
-     * Approximately 70% to 75% of spitzer projectile bounding cylindrical volume [-]
+     * Approximately 70% to 75% of Spitzer projectile bounding cylindrical volume [-]
      */
     public static final double BULLET_VOLUME_FACTOR = 0.73;
     /**

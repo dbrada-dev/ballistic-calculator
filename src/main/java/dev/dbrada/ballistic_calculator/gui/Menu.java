@@ -20,24 +20,26 @@ public class Menu extends Application {
         Pane root = new Pane();
 
         //settings button
-        ImageView settingsIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/gui/icons/"+UserSettings.colorPreset+"-settings.png"))));
+        ImageView settingsIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/gui/icons/"+UserSettings.colorPreset.getPrefix()+"-settings.png"))));
         settingsIcon.setFitWidth(32);
         settingsIcon.setFitHeight(32);
         settingsIcon.setPreserveRatio(true);
 
-        Button settings = new Button();
-        settings.setPrefSize(32, 32);
-        settings.setGraphic(settingsIcon);
+        Button settingsButton = new Button();
+        settingsButton.setPrefSize(32, 32);
+        settingsButton.setGraphic(settingsIcon);
 
-        settings.setOnAction(
-                (evt) -> {
-                    //TODO
+        settingsButton.setOnAction(
+                (_) -> {
+                    Scene current = settingsButton.getScene();
+                    Settings settingsWindow = new Settings(current);
+                    stage.setScene(settingsWindow.getScene());
                 }
         );
 
-        settings.layoutXProperty().bind(root.widthProperty().multiply(1).subtract(settings.widthProperty()));
-        settings.layoutYProperty().bind(root.heightProperty().multiply(0));
-        root.getChildren().add(settings);
+        settingsButton.layoutXProperty().bind(root.widthProperty().multiply(1).subtract(settingsButton.widthProperty()));
+        settingsButton.layoutYProperty().bind(root.heightProperty().multiply(0));
+        root.getChildren().add(settingsButton);
 
         //the options
             Label optionsLabel = new Label("Options");
@@ -59,9 +61,9 @@ public class Menu extends Application {
 
 
         Scene scene = new Scene(root, 640, 360);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/" + UserSettings.colorPreset + ".css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/" + UserSettings.colorPreset.getPrefix() + ".css")).toExternalForm());
 
-        stage.setTitle("Menu - Ballistic Calculator");
+        stage.setTitle("Ballistic Calculator");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
