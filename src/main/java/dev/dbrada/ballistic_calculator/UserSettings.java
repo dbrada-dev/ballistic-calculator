@@ -7,13 +7,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Properties;
+import java.util.*;
 
 public abstract class UserSettings {
     public static Colors colorPreset = Colors.DARK;
+    public static Languages lang = Languages.EN_US;
+    public static Map<String, Enum<?>> defaultUnits = defaultUnitsInit();
 
+    private static ResourceBundle bundle = ResourceBundle.getBundle("langs/lang", lang.locale);
+
+    public static String getStr(String key) {
+        return bundle.getString(key);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void init() {
         File file = new File(Path.of(getConfigPath().toString(), "config").toString());
         if (!file.exists()) return;
@@ -21,16 +31,39 @@ public abstract class UserSettings {
         Properties props = new Properties();
         try (FileInputStream in = new FileInputStream(file)) {
             props.load(in);
-            colorPreset = Colors.valueOf(props.getProperty("colorPreset").toUpperCase());
-        } catch (IOException | NumberFormatException e) {
+            Map<String, Enum<?>> temp = new HashMap<>();
+            for (String s : defaultUnits.keySet()) {
+                temp.put(s, (Enum<?>) defaultUnits.get(s).getClass().getMethod("valueOf", String.class).invoke(null, props.getProperty(s)));
+            }
+            for (String s : defaultUnits.keySet()) {
+                boolean notValid = true;
+                for (Enum<?> e : Constants.ALLOWED_UNITS.get(s)) {
+                    if (e.equals(temp.get(s))) {
+                        notValid = false;
+                        break;
+                    }
+                }
+                if (notValid) throw new IllegalStateException("Default unit is not in allowed");
+            }
+            colorPreset = Colors.valueOf(props.getProperty("colorPreset"));
+            lang = Languages.valueOf(props.getProperty("lang"));
+            defaultUnits = temp;
+            bundle = ResourceBundle.getBundle("langs/lang", lang.locale);
+        } catch (IOException | NumberFormatException | NoSuchMethodException | IllegalAccessException |
+                 InvocationTargetException | IllegalStateException e) {
             System.err.println("No load done\n" + e.getMessage());
+            file.delete();
         }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void save() {
         Properties props = new Properties();
-        props.setProperty("colorPreset", colorPreset.prefix);
+        props.setProperty("colorPreset", colorPreset.toString());
+        props.setProperty("lang", lang.toString());
+        for (Map.Entry<String, Enum<?>> e : defaultUnits.entrySet()) {
+            props.setProperty(e.getKey(), e.getValue().toString());
+        }
 
         Path path = getConfigPath();
         new File(path.toUri()).mkdir();
@@ -60,13 +93,31 @@ public abstract class UserSettings {
         };
     }
 
+    private static Map<String, Enum<?>> defaultUnitsInit() {
+        HashMap<String, Enum<?>> result = new HashMap<>();
+        for (Map.Entry<String, Enum<?>[]> e : Constants.ALLOWED_UNITS.entrySet()) {
+            result.put(e.getKey(), e.getValue()[0]);
+        }
+        return result;
+    }
+
     @Getter
     @AllArgsConstructor
     public enum Colors {
-        DARK("dark", "Dark"),
-        LIGHT("light", "Light");
+        DARK("dark", "scheme.dark"),
+        LIGHT("light", "scheme.light");
 
         private final String prefix;
         private final String name;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum Languages {
+        EN_US("English - US", Locale.US),
+        EN_UK("English - UK", Locale.UK);
+
+        private final String name;
+        private final Locale locale;
     }
 }

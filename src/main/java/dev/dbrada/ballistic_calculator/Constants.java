@@ -1,5 +1,10 @@
 package dev.dbrada.ballistic_calculator;
 
+import dev.dbrada.ballistic_calculator.units.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class Constants {
     /**
      * Integration interval <= 0.001s is considered precise enough
@@ -65,4 +70,32 @@ public abstract class Constants {
      * Standard sea level air density (ρ_std) [kg/m3]
      */
     public static final double SEA_LEVEL_AIR_DENSITY = 1.225;
+    /**
+     * Specified units allowed for different tasks
+     */
+    public static final Map<String, Enum<?>[]> ALLOWED_UNITS = allowedInit();
+    private static Map<String, Enum<?>[]> allowedInit() {
+        HashMap<String, Enum<?>[]> result = new HashMap<>();
+        result.put("diameter", new Length.ELength[]{Length.ELength.MM, Length.ELength.IN});
+        result.put("mass", new Mass.EMass[]{Mass.EMass.GR, Mass.EMass.G});
+        result.put("velocity", new Speed.ESpeed[]{Speed.ESpeed.MPS, Speed.ESpeed.FPS});
+        result.put("balCoef", new BallisticCoefficient.EBallisticCoefficient[]{BallisticCoefficient.EBallisticCoefficient.G1, BallisticCoefficient.EBallisticCoefficient.G7});
+        result.put("zeroRange", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
+        result.put("sightHeight", new Length.ELength[]{Length.ELength.CM, Length.ELength.MM, Length.ELength.IN});
+        result.put("twistRate", new Length.ELength[]{Length.ELength.IN, Length.ELength.CM, Length.ELength.MM});
+        result.put("temperature", new Temperature.ETemperature[]{Temperature.ETemperature.C, Temperature.ETemperature.F});
+        result.put("windSpeed", new Speed.ESpeed[]{Speed.ESpeed.KMPH, Speed.ESpeed.MPH, Speed.ESpeed.MPS});
+        result.put("windAzimuth", new Angle.EAngle[]{Angle.EAngle.DEG});
+        result.put("altitude", new Length.ELength[]{Length.ELength.M, Length.ELength.FT, Length.ELength.YD});
+        result.put("pressure", new Pressure.EPressure[]{Pressure.EPressure.HPA, Pressure.EPressure.KPA});
+        result.put("shotAngle", new Angle.EAngle[]{Angle.EAngle.DEG});
+        result.put("maxRange", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
+        result.put("rangeStep", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
+
+        result.put("range", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
+        result.put("deviationL", new Length.ELength[]{Length.ELength.CM, Length.ELength.IN});
+        result.put("deviationA", new Angle.EAngle[]{Angle.EAngle.MRAD, Angle.EAngle.MOA});
+
+        return result;
+    }
 }

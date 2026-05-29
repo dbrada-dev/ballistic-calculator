@@ -4,3 +4,6 @@
     -fx-default-text-fill: #BCBCBC;
     -fx-control-inner-background: #272727;
 }
+.text-input {
+    -fx-prompt-text-fill: #909090;
+}

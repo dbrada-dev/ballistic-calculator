@@ -40,16 +40,26 @@ public class Menu extends Application {
         settingsButton.layoutXProperty().bind(root.widthProperty().multiply(1).subtract(settingsButton.widthProperty()));
         settingsButton.layoutYProperty().bind(root.heightProperty().multiply(0));
         root.getChildren().add(settingsButton);
+        //
 
         //the options
-            Label optionsLabel = new Label("Options");
-            optionsLabel.setStyle("-fx-font-size: 20px");
+        Label optionsLabel = new Label(UserSettings.getStr("options.label"));
+        optionsLabel.setStyle("-fx-font-size: 20px");
 
-            Pane spacer = new Pane();
-            spacer.setPrefSize(1, 10);
-            //regular calculation
-            Button normalCalculation = new Button("Calculate ballistic curve");
-            normalCalculation.setPrefSize(400, 40);
+        Pane spacer = new Pane();
+        spacer.setPrefSize(1, 10);
+        //regular calculation
+        Button normalCalculation = new Button(UserSettings.getStr("normalCalculation.button"));
+        normalCalculation.setPrefSize(400, 40);
+
+        normalCalculation.setOnAction(
+                (_) -> {
+                    Scene current = settingsButton.getScene();
+                    RegularCalculationForm formWindow = new RegularCalculationForm(current);
+                    stage.setScene(formWindow.getScene());
+                }
+        );
+        //
 
         VBox options = new VBox(optionsLabel, spacer, normalCalculation);
         options.setAlignment(Pos.CENTER);
@@ -57,6 +67,7 @@ public class Menu extends Application {
         options.layoutXProperty().bind(root.widthProperty().multiply(0.5).subtract(options.widthProperty().divide(2)));
         options.layoutYProperty().bind(root.heightProperty().multiply(0.5).subtract(options.heightProperty().divide(2)));
         root.getChildren().add(options);
+        //
 
 
 

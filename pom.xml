@@ -6,7 +6,7 @@
 
     <groupId>dev.dbrada.ballistic_calculator</groupId>
     <artifactId>ballistic-calculator</artifactId>
-    <version>v0.0.0</version>
+    <version>0.0.0</version>
 
     <dependencies>
         <dependency>
@@ -50,11 +50,15 @@
                 <configuration>
                     <executable>java</executable>
                     <arguments>
+                        <argument>--enable-native-access=javafx.graphics</argument>
+                        <argument>--module-path</argument>
+                        <modulepath/>
+                        <argument>--add-modules</argument>
+                        <argument>javafx.controls,javafx.graphics</argument>
                         <argument>-classpath</argument>
                         <classpath />
                         <argument>dev.dbrada.ballistic_calculator.Main</argument>
                     </arguments>
-                    <!-- <mainClass>dev.dbrada.ballistic_calculator.Main</mainClass> -->
                 </configuration>
             </plugin>
             <plugin>

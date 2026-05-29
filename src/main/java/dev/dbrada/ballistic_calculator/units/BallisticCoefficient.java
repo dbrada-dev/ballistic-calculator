@@ -13,8 +13,8 @@ public class BallisticCoefficient {
     @Getter
     @AllArgsConstructor
     public enum EBallisticCoefficient {
-        G1 ("/g1_dragCoefStd.csv", "G1"),
-        G7 ("/g7_dragCoefStd.csv", "G7");
+        G1 ("/dragCoefficients/g1_dragCoefStd.csv", "G1"),
+        G7 ("/dragCoefficients/g7_dragCoefStd.csv", "G7");
 
         private final String resource;
         private final String name;
