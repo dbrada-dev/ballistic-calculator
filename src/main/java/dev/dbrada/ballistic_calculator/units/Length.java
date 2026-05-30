@@ -4,12 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * Handles length variables
+ */
 @Data
 @AllArgsConstructor
 public class Length {
     private double value;
     private ELength unit;
 
+    /**
+     * @param targetUnit wanted unit
+     * @return a value of the wanted unit
+     */
     public double get(ELength targetUnit) {
         return switch(targetUnit) {
             case MM -> getMM();
@@ -21,12 +28,20 @@ public class Length {
         };
     }
 
+    /**
+     * @param targetUnit wanted unit
+     * @param decimals number of decimal places
+     * @return a value of the wanted unit
+     */
     public double get(ELength targetUnit, int decimals) {
         if (decimals < 0) return get(targetUnit);
         double round = Math.pow(10, decimals);
         return Math.round(get(targetUnit) * round)/round;
     }
 
+    /**
+     * @return value of mm
+     */
     public double getMM() {
         return switch(unit) {
             case MM -> value;
@@ -38,6 +53,9 @@ public class Length {
         };
     }
 
+    /**
+     * @return value of cm
+     */
     public double getCM() {
         return switch(unit) {
             case MM -> value / 10.0;
@@ -49,6 +67,9 @@ public class Length {
         };
     }
 
+    /**
+     * @return value of m
+     */
     public double getM() {
         return switch(unit) {
             case MM -> value * 1e-03;
@@ -60,6 +81,9 @@ public class Length {
         };
     }
 
+    /**
+     * @return value of in
+     */
     public double getIN() {
         return switch(unit) {
             case MM -> value * 0.0393701;
@@ -71,6 +95,9 @@ public class Length {
         };
     }
 
+    /**
+     * @return value of ft
+     */
     public double getFT() {
         return switch(unit) {
             case MM -> value * 0.00328084;
@@ -82,6 +109,9 @@ public class Length {
         };
     }
 
+    /**
+     * @return value of yd
+     */
     public double getYD() {
         return switch(unit) {
             case MM -> value * 0.00109361;
@@ -93,6 +123,9 @@ public class Length {
         };
     }
 
+    /**
+     * Handles length units
+     */
     @Getter
     @AllArgsConstructor
     public enum ELength {

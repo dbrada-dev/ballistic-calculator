@@ -10,19 +10,25 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 
 import java.util.Objects;
 
+/**
+ * Provides a gui display of a ballistic curve by table
+ */
 @AllArgsConstructor
 public class DisplayBallisticTable {
     private final Scene previous;
     private final BallisticCurve bc;
     private final Parameters param;
 
+    /**
+     * Constructs the gui image
+     * @return a {@code Scene} to be displayed
+     */
     public Scene getScene() {
         Pane root = new Pane();
 
@@ -64,8 +70,8 @@ public class DisplayBallisticTable {
             grid.add(new Label(header[i]), i, 0);
         }
 
-        for (int i = 0; i < bc.getCurve().length; i++) {
-            String[] node = getLine(bc.getCurve()[i], len);
+        for (int i = 0; i < bc.curve().length; i++) {
+            String[] node = getLine(bc.curve()[i], len);
             for (int j = 0; j < node.length; j++) {
                 grid.add(new Label(node[j]), j, i+1);
             }
@@ -77,6 +83,12 @@ public class DisplayBallisticTable {
         return scene;
     }
 
+    /**
+     * Makes a line of table
+     * @param node the line of a table
+     * @param len length of the line
+     * @return a line of the table
+     */
     private String[] getLine(BallisticCurve.Node node, int len) {
         String[] result = new String[len];
 
@@ -96,6 +108,11 @@ public class DisplayBallisticTable {
         return result;
     }
 
+    /**
+     * Makes a table header
+     * @param len length of the header
+     * @return a header for the table
+     */
     private String[] getHeader(int len) {
         String[] result = new String[len];
 

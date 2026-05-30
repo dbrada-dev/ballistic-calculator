@@ -4,12 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * Handles angle variables
+ */
 @Data
 @AllArgsConstructor
 public class Angle {
     private double value;
     private EAngle unit;
 
+    /**
+     * @param targetUnit wanted unit
+     * @return a value of the wanted unit
+     */
     public double get(EAngle targetUnit) {
         return switch(targetUnit) {
             case DEG -> getDEG();
@@ -19,12 +26,20 @@ public class Angle {
         };
     }
 
+    /**
+     * @param targetUnit wanted unit
+     * @param decimals number of decimal places
+     * @return a value of the wanted unit
+     */
     public double get(EAngle targetUnit, int decimals) {
         if (decimals < 0) return get(targetUnit);
         double round = Math.pow(10, decimals);
         return Math.round(get(targetUnit) * round)/round;
     }
 
+    /**
+     * @return value of deg
+     */
     public double getDEG() {
         return switch(unit) {
             case DEG -> value;
@@ -34,6 +49,9 @@ public class Angle {
         };
     }
 
+    /**
+     * @return value of rad
+     */
     public double getRAD() {
         return switch(unit) {
             case DEG -> value * (Math.PI/180.0);
@@ -43,6 +61,9 @@ public class Angle {
         };
     }
 
+    /**
+     * @return value of MOA
+     */
     public double getMOA() {
         return switch(unit) {
             case DEG -> value * 60;
@@ -52,6 +73,9 @@ public class Angle {
         };
     }
 
+    /**
+     * @return value of mrad
+     */
     public double getMRAD() {
         return switch(unit) {
             case DEG -> value * (Math.PI/180.0) * 1000;
@@ -61,6 +85,9 @@ public class Angle {
         };
     }
 
+    /**
+     * Handles the angle units
+     */
     @Getter
     @AllArgsConstructor
     public enum EAngle {

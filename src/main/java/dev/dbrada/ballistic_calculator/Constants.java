@@ -5,6 +5,9 @@ import dev.dbrada.ballistic_calculator.units.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Holds constants
+ */
 public abstract class Constants {
     /**
      * Integration interval <= 0.001s is considered precise enough
@@ -74,6 +77,10 @@ public abstract class Constants {
      * Specified units allowed for different tasks
      */
     public static final Map<String, Enum<?>[]> ALLOWED_UNITS = allowedInit();
+    /**
+     * Initializes {@code ALLOWED_UNITS}, faster and more efficient than file loading, shall not be changed unless other code edit
+     * @return map of {@code String} and unit enums
+     */
     private static Map<String, Enum<?>[]> allowedInit() {
         HashMap<String, Enum<?>[]> result = new HashMap<>();
         result.put("diameter", new Length.ELength[]{Length.ELength.MM, Length.ELength.IN});

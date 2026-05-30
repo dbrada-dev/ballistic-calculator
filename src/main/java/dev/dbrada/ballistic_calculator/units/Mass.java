@@ -4,12 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * Handles mass variables
+ */
 @Data
 @AllArgsConstructor
 public class Mass {
     private double value;
     private EMass unit;
 
+    /**
+     * @param targetUnit wanted unit
+     * @return a value of the wanted unit
+     */
     public double get(EMass targetUnit) {
         return switch(targetUnit) {
             case G -> getG();
@@ -19,12 +26,20 @@ public class Mass {
         };
     }
 
+    /**
+     * @param targetUnit wanted unit
+     * @param decimals number of decimal places
+     * @return a value of the wanted unit
+     */
     public double get(EMass targetUnit, int decimals) {
         if (decimals < 0) return get(targetUnit);
         double round = Math.pow(10, decimals);
         return Math.round(get(targetUnit) * round)/round;
     }
 
+    /**
+     * @return value of g
+     */
     public double getG() {
         return switch(unit) {
             case G -> value;
@@ -34,6 +49,9 @@ public class Mass {
         };
     }
 
+    /**
+     * @return value of kg
+     */
     public double getKG() {
         return switch(unit) {
             case G -> value * 1e-03;
@@ -43,6 +61,9 @@ public class Mass {
         };
     }
 
+    /**
+     * @return value of gr
+     */
     public double getGR() {
         return switch(unit) {
             case G -> value * 15.4324;
@@ -52,6 +73,9 @@ public class Mass {
         };
     }
 
+    /**
+     * @return value of lb
+     */
     public double getLB() {
         return switch(unit) {
             case G -> value * 0.00220462;
@@ -61,6 +85,9 @@ public class Mass {
         };
     }
 
+    /**
+     * Handles mass units
+     */
     @Getter
     @AllArgsConstructor
     public enum EMass {

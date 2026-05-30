@@ -4,12 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * Handles ballistic coefficient variables
+ */
 @Data
 @AllArgsConstructor
 public class BallisticCoefficient {
     private double value;
     private EBallisticCoefficient type;
 
+    /**
+     * Handles ballistic coefficient typed
+     */
     @Getter
     @AllArgsConstructor
     public enum EBallisticCoefficient {

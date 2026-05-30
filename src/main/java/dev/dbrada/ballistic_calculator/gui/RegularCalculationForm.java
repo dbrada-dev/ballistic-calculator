@@ -23,10 +23,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Handles the form and creation of Parameters
+ */
 @AllArgsConstructor
 public class RegularCalculationForm {
     private final Scene previous;
 
+    /**
+     * Constructs the final form
+     * @return a {@code Scene} to be displayed
+     */
     @SuppressWarnings("unchecked")
     public Scene getScene() {
         Pane root = new Pane();
@@ -374,6 +381,14 @@ public class RegularCalculationForm {
         return scene;
     }
 
+    /**
+     * Initializes diameter form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] diameterInit() {
         Label diameterLabel = new Label(UserSettings.getStr("diameter.label"));
 
@@ -448,6 +463,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes mass form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] massInit() {
         Label massLabel = new Label(UserSettings.getStr("mass.label"));
 
@@ -522,6 +545,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes velocity form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] velocityInit() {
         Label velocityLabel = new Label(UserSettings.getStr("velocity.label"));
 
@@ -596,6 +627,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes ballistic coefficient form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} type
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] balCoefInit() {
         Label balCoefLabel = new Label(UserSettings.getStr("balCoef.label"));
 
@@ -670,6 +709,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes zero range form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] zeroRangeInit() {
         Label zeroRangeLabel = new Label(UserSettings.getStr("zeroRange.label"));
 
@@ -744,6 +791,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes sight height form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] sightHeightInit() {
         Label sightHeightLabel = new Label(UserSettings.getStr("sightHeight.label"));
 
@@ -818,6 +873,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes twist rate form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] twistRateInit() {
         Label twistRateLabel = new Label(UserSettings.getStr("twistRate.label"));
 
@@ -892,6 +955,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes temperature form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] temperatureInit() {
         Label temperatureLabel = new Label(UserSettings.getStr("temperature.label"));
 
@@ -966,6 +1037,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes humidity form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] humidityInit() {
         Label humidityLabel = new Label(UserSettings.getStr("humidity.label"));
 
@@ -1015,6 +1094,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes wind speed form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField}
+     * <li> 3rd {@code Object} is {@code ChoiceBox}
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty}
+     */
     private Object[] windSpeedInit() {
         Label windSpeedLabel = new Label(UserSettings.getStr("windSpeed.label"));
 
@@ -1089,6 +1176,15 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes wind azimuth form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     * <li> 6th {@code Object} is {@code Label} description
+     */
     private Object[] windAzimuthInit() {
         Label windAzimuthLabel = new Label(UserSettings.getStr("windAzimuth.label"));
 
@@ -1167,6 +1263,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes altitude form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] altitudeInit() {
         Label altitudeLabel = new Label(UserSettings.getStr("altitude.label"));
 
@@ -1241,6 +1345,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes pressure form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] pressureInit() {
         Label pressureLabel = new Label(UserSettings.getStr("pressure.label"));
 
@@ -1315,6 +1427,15 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes shot angle form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     * <li> 6th {@code Object} is {@code Label} description
+     */
     private Object[] shotAngleInit() {
         Label shotAngleLabel = new Label(UserSettings.getStr("shotAngle.label"));
 
@@ -1393,6 +1514,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes max calculation range form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] maxRangeInit() {
         Label maxRangeLabel = new Label(UserSettings.getStr("maxRange.label"));
 
@@ -1467,6 +1596,14 @@ public class RegularCalculationForm {
         return result;
     }
 
+    /**
+     * Initializes calculation range step form
+     * @return <li> 1st {@code Object} is {@code Label}
+     * <li> 2nd {@code Object} is {@code TextField} value field
+     * <li> 3rd {@code Object} is {@code ChoiceBox} unit
+     * <li> 4th {@code Object} is {@code BooleanBinding} isInvalid
+     * <li> 5th {@code Object} is {@code ObjectProperty} value
+     */
     private Object[] rangeStepInit() {
         Label rangeStepLabel = new Label(UserSettings.getStr("rangeStep.label"));
 

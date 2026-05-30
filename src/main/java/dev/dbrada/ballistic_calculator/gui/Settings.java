@@ -14,20 +14,25 @@ import javafx.util.StringConverter;
 
 import java.util.Objects;
 
+/**
+ * Handles user setting gui
+ */
 public class Settings {
     private final Scene previous;
 
     private final ChoiceBox<UserSettings.Languages> lang;
     private final ChoiceBox<UserSettings.Colors> colorPreset;
-    private final VBox defaultUnits;
 
     public Settings(Scene previous) {
         this.previous = previous;
         this.lang = new ChoiceBox<>();
         this.colorPreset = new ChoiceBox<>();
-        this.defaultUnits = new VBox();
     }
 
+    /**
+     * Constructs the gui display
+     * @return a {@code Scene} to be displayed
+     */
     public Scene getScene() {
         Pane root = new Pane();
 
@@ -100,6 +105,9 @@ public class Settings {
         return scene;
     }
 
+    /**
+     * Initializes language options
+     */
     private void langInit() {
         lang.getItems().addAll(UserSettings.Languages.values());
         lang.setValue(UserSettings.lang);
@@ -121,6 +129,9 @@ public class Settings {
         });
     }
 
+    /**
+     * Initializes color preset options
+     */
     private void colorPresetInit() {
         colorPreset.getItems().addAll(UserSettings.Colors.values());
         colorPreset.setValue(UserSettings.colorPreset);

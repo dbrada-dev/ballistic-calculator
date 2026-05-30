@@ -12,6 +12,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Serves as user-set constants
+ */
 public abstract class UserSettings {
     public static Colors colorPreset = Colors.DARK;
     public static Languages lang = Languages.EN_US;
@@ -19,10 +22,18 @@ public abstract class UserSettings {
 
     private static ResourceBundle bundle = ResourceBundle.getBundle("langs/lang", lang.locale);
 
+    /**
+     * Retrieves a {@code String} in specified language
+     * @param key string key
+     * @return {@code String} in specified language
+     */
     public static String getStr(String key) {
         return bundle.getString(key);
     }
 
+    /**
+     * Loads variables on start
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void init() {
         File file = new File(Path.of(getConfigPath().toString(), "config").toString());
@@ -56,6 +67,9 @@ public abstract class UserSettings {
         }
     }
 
+    /**
+     * Saves variables set in settings window
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void save() {
         Properties props = new Properties();
@@ -75,6 +89,9 @@ public abstract class UserSettings {
         }
     }
 
+    /**
+     * @return path to system default config folder
+     */
     private static Path getConfigPath() {
         String os = System.getProperty("os.name").toLowerCase();
         String app = "ballistic-calculator/";
@@ -93,6 +110,10 @@ public abstract class UserSettings {
         };
     }
 
+    /**
+     * Initializes units based on first specified in allowed
+     * @return map of {@code String} and unit enum
+     */
     private static Map<String, Enum<?>> defaultUnitsInit() {
         HashMap<String, Enum<?>> result = new HashMap<>();
         for (Map.Entry<String, Enum<?>[]> e : Constants.ALLOWED_UNITS.entrySet()) {
@@ -101,6 +122,9 @@ public abstract class UserSettings {
         return result;
     }
 
+    /**
+     * Handles color presets
+     */
     @Getter
     @AllArgsConstructor
     public enum Colors {
@@ -111,6 +135,9 @@ public abstract class UserSettings {
         private final String name;
     }
 
+    /**
+     * Handles languages
+     */
     @Getter
     @AllArgsConstructor
     public enum Languages {

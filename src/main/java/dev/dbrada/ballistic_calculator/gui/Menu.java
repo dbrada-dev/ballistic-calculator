@@ -14,7 +14,18 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
+/**
+ * Handles the main menu and initial start-up
+ */
 public class Menu extends Application {
+
+    /**
+     * Constructs the gui menu
+     * @param stage the primary stage for this application, onto which
+     * the application scene can be set.
+     * Applications may create other stages, if needed, but they will not be
+     * primary stages.
+     */
     @Override
     public void start(Stage stage){
         Pane root = new Pane();

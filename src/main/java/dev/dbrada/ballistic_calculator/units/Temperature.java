@@ -4,12 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * Handles temperature variables
+ */
 @Data
 @AllArgsConstructor
 public class Temperature {
     private double value;
     private ETemperature unit;
 
+    /**
+     * @param targetUnit wanted unit
+     * @return a value of the wanted unit
+     */
     public double get(ETemperature targetUnit) {
         return switch(targetUnit) {
             case C -> getC();
@@ -18,12 +25,20 @@ public class Temperature {
         };
     }
 
+    /**
+     * @param targetUnit wanted unit
+     * @param decimals number of decimal places
+     * @return a value of the wanted unit
+     */
     public double get(ETemperature targetUnit, int decimals) {
         if (decimals < 0) return get(targetUnit);
         double round = Math.pow(10, decimals);
         return Math.round(get(targetUnit) * round)/round;
     }
 
+    /**
+     * @return value of °C
+     */
     public double getC() {
         return switch(unit) {
             case C -> value;
@@ -32,6 +47,9 @@ public class Temperature {
         };
     }
 
+    /**
+     * @return value of K
+     */
     public double getK() {
         return switch(unit) {
             case C -> value + 273.15;
@@ -40,6 +58,9 @@ public class Temperature {
         };
     }
 
+    /**
+     * @return value of °F
+     */
     public double getF() {
         return switch(unit) {
             case C -> value * 1.8 + 32;
@@ -48,6 +69,9 @@ public class Temperature {
         };
     }
 
+    /**
+     * Handles temperature units
+     */
     @Getter
     @AllArgsConstructor
     public enum ETemperature {

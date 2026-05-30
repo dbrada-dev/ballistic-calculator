@@ -1,12 +1,14 @@
 package dev.dbrada.ballistic_calculator;
 
 import dev.dbrada.ballistic_calculator.units.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.*;
 import java.util.*;
 
+/**
+ * Handles all physics calculation
+ */
 @Data
 public class Physics {
     private Parameters param;
@@ -23,6 +25,10 @@ public class Physics {
     private final double[][] dragCoefStd;
     private double angleOfDepartureRAD;
 
+    /**
+     * Initialize exec-once variables
+     * @param param calculation variables
+     */
     public Physics(Parameters param) {
         this.param = param;
         this.vaporPressure = vaporPressure();
@@ -35,7 +41,12 @@ public class Physics {
         this.angleOfDepartureRAD = angleOfDepartureRAD();
     }
 
-    public Physics(Parameters param, boolean noAngleOfDeparture) {
+    /**
+     * Initialize exec-once variables, used for zero angle
+     * @param param calculation parameters
+     * @param ignoredNoAngleOfDeparture handles a recursion trap
+     */
+    public Physics(Parameters param, boolean ignoredNoAngleOfDeparture) {
         this.param = param;
         this.vaporPressure = vaporPressure();
         this.airDensityKGPM3 = airDensityKGPM3();
@@ -47,6 +58,11 @@ public class Physics {
         this.angleOfDepartureRAD = 0;
     }
 
+    /**
+     * Integrates the flight curve
+     * @param p a physics env
+     * @return list of points of flight curve
+     */
     public static LinkedList<double[]> positionIntegration(Physics p) {
         //0-X,1-Y,2-Z
         double[] pos = new double[]{0,0,0};
@@ -115,10 +131,22 @@ public class Physics {
 
 //█ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█ █░▀█ ░█░ ██▄ █▄█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
+    /**
+     * Calculates drag
+     * @param velocityMPS current velocity
+     * @param prevIndex previous drag coefficient index
+     * @return drag
+     */
     private double dragDeceleration(double velocityMPS, int[] prevIndex) {
         return (airDensityKGPM3 * velocityMPS * velocityMPS * (frontalAreaM2 * (formFactor * getDragCoef(velocityMPS, prevIndex))))/(2*param.mass().getKG());
     }
 
+    /**
+     * Retrieves drag coefficient
+     * @param velocityMPS current velocity
+     * @param prevIndex previous drag coefficient index
+     * @return drag coefficient
+     */
     private double getDragCoef(double velocityMPS, int[] prevIndex) {
         double mach = machNumber(velocityMPS);
         int i = prevIndex[0];
@@ -160,18 +188,36 @@ public class Physics {
         }
     }
 
-
+    /**
+     * Calculate point between ballistic coefficient table entries
+     * @param low lower index
+     * @param lowValue value of lower index
+     * @param high higher index
+     * @param highValue value of higher index
+     * @param point current point between values
+     * @return more accurate ballistic coefficient
+     */
     private double dragLinearInterpolation(double low, double lowValue, double high, double highValue, double point) {
         if (high == low) return lowValue;
         return lowValue + (point-low)*(highValue-lowValue)/(high-low);
     }
 
+    /**
+     * Calculates mach number
+     * @param velocityMPS current velocity
+     * @return mach number
+     */
     private double machNumber(double velocityMPS) {
         return velocityMPS/speedOfSound.getMPS();
     }
 
 //█▀█ █▀█ █▀ ▀█▀ ▄▄ █ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█▀▀ █▄█ ▄█ ░█░ ░░ █ █░▀█ ░█░ ██▄ █▄█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
+    /**
+     * Calculates spin drift
+     * @param timeS time of flight
+     * @return spin drift deviation
+     */
     private Length spinDrift(double timeS) {
         double value = Math.signum(param.twistRate().getValue()) * 1.25*(stabilityFactor + 1.2)*Math.pow(timeS, 1.83);
         return new Length(value, Length.ELength.IN);
@@ -179,31 +225,55 @@ public class Physics {
 
 //█▀▀ ▀▄▀ █▀▀ █▀▀ ▄▄ █▀█ █▄░█ █▀▀ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //██▄ █░█ ██▄ █▄▄ ░░ █▄█ █░▀█ █▄▄ ██▄  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
+    /**
+     * Calculates vapor pressure
+     * @return vapor pressure
+     */
     private Pressure vaporPressure() {
         double saturationVaporPressure = Constants.SATURATION_WATER_PRESSURE * Math.exp(Constants.EMPIRICAL_WATER_VAPOR_CONSTANT*param.temperature().getC()/(Constants.TEMPERATURE_SCALING_CONSTANT+param.temperature().getC()));
         double value = param.humidity()/100 * saturationVaporPressure;
         return new Pressure(value, Pressure.EPressure.PA);
     }
 
+    /**
+     * Calculates air density
+     * @return air density
+     */
     private double airDensityKGPM3() {
         return (param.pressure().getPA()-Constants.VAPOR_PRESSURE_FACTOR*vaporPressure.getPA())/(Constants.AIR_GAS_CONSTANT*param.temperature().getK());
     }
 
+    /**
+     * Calculates speed of sound
+     * @return speed of sound
+     */
     private Speed speedOfSound() {
         double virtualTemperature = param.temperature().getK()/(1-Constants.VAPOR_PRESSURE_FACTOR*(vaporPressure.getPA()/param.pressure().getPA()));
         double value = Math.sqrt(Constants.DRY_AIR_HEAT_CAPACITY*Constants.AIR_GAS_CONSTANT*virtualTemperature);
         return new Speed(value, Speed.ESpeed.MPS);
     }
 
+    /**
+     * Calculates front area of projectile
+     * @return frontal area
+     */
     private double frontalAreaM2() {
         return Math.PI * param.diameter().getM()*param.diameter().getM()/4;
     }
 
+    /**
+     * Calculates form factor of projectile compared to standard
+     * @return form factor
+     */
     private double formFactor() {
         double sectionalDensityLBPIN2 = param.mass().getLB()/(param.diameter().getIN()*param.diameter().getIN());
         return sectionalDensityLBPIN2/param.balCoef().getValue();
     }
 
+    /**
+     * Calculates stability factor
+     * @return stability factor
+     */
     private double stabilityFactor() {
         if (param.twistRate().getValue() == 0) return 0;
         double bulletLengthCAL = param.mass().getKG()/(Constants.BULLET_VOLUME_FACTOR*Constants.BULLET_DENSITY*frontalAreaM2)/param.diameter().getM();
@@ -214,6 +284,10 @@ public class Physics {
         return fixedStabilityFactor*densityCorrection*velocityCorrection;
     }
 
+    /**
+     * Retrieve table of mach number, standard drag coefficient
+     * @return table of mach number, standard drag coefficient
+     */
     private double[][] dragCoefStd() {
         try(InputStream in = getClass().getResourceAsStream(param.balCoef().getType().getResource())) {
             if (in == null) throw new IOException("No resource found");
@@ -236,6 +310,10 @@ public class Physics {
         }
     }
 
+    /**
+     * Calculates and estimates the angle of departure
+     * @return angle of departure
+     */
     private double angleOfDepartureRAD() {
         Parameters p = new Parameters(param.diameter(), param.mass(), param.velocity(), param.balCoef(), param.zeroRange(), param.sightHeight(), param.twistRate(), new Temperature(15, Temperature.ETemperature.C), 50, new Speed(0, Speed.ESpeed.MPS), new Angle(0, Angle.EAngle.DEG), calculatePressure(new Length(250, Length.ELength.M)), new Angle(0, Angle.EAngle.DEG), param.zeroRange(), param.zeroRange(), null,null, null, false, false);
         Physics estimationEnv = new Physics(p, false);
@@ -268,6 +346,11 @@ public class Physics {
 
 //█▀█ █░█ █▄▄ █░░ █ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█▀▀ █▄█ █▄█ █▄▄ █ █▄▄  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
+    /**
+     * Calculates station pressure
+     * @param altitude current altitude
+     * @return pressure
+     */
     public static Pressure calculatePressure(Length altitude) {
         double value = Constants.SEA_LEVEL_PRESSURE * Math.pow(1.0-Constants.TEMPERATURE_LAPS_RATE*altitude.getM()/Constants.SEA_LEVEL_TEMPERATURE, Constants.GRAVITY*Constants.AIR_MOLAR_MASS/(Constants.GAS_CONSTANT*Constants.TEMPERATURE_LAPS_RATE));
         return new Pressure(value, Pressure.EPressure.PA);

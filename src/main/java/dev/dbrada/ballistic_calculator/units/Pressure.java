@@ -4,12 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * Handles pressure variables
+ */
 @Data
 @AllArgsConstructor
 public class Pressure {
     private double value;
     private EPressure unit;
 
+    /**
+     * @param targetUnit wanted unit
+     * @return a value of the wanted unit
+     */
     public double get(EPressure targetUnit) {
         return switch(targetUnit) {
             case PA -> getPA();
@@ -18,12 +25,20 @@ public class Pressure {
         };
     }
 
+    /**
+     * @param targetUnit wanted unit
+     * @param decimals number of decimal places
+     * @return a value of the wanted unit
+     */
     public double get(EPressure targetUnit, int decimals) {
         if (decimals < 0) return get(targetUnit);
         double round = Math.pow(10, decimals);
         return Math.round(get(targetUnit) * round)/round;
     }
 
+    /**
+     * @return value of Pa
+     */
     public double getPA() {
         return switch(unit) {
             case PA -> value;
@@ -32,6 +47,9 @@ public class Pressure {
         };
     }
 
+    /**
+     * @return value of hPa
+     */
     public double getHPA() {
         return switch(unit) {
             case PA -> value * 1e-02;
@@ -40,6 +58,9 @@ public class Pressure {
         };
     }
 
+    /**
+     * @return value of kPa
+     */
     public double getKPA() {
         return switch(unit) {
             case PA -> value * 1e-03;
@@ -48,6 +69,9 @@ public class Pressure {
         };
     }
 
+    /**
+     * Handles mass units
+     */
     @Getter
     @AllArgsConstructor
     public enum EPressure {
