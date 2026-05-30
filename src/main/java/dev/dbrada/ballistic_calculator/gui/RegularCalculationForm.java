@@ -1,9 +1,6 @@
 package dev.dbrada.ballistic_calculator.gui;
 
-import dev.dbrada.ballistic_calculator.Constants;
-import dev.dbrada.ballistic_calculator.Parameters;
-import dev.dbrada.ballistic_calculator.Physics;
-import dev.dbrada.ballistic_calculator.UserSettings;
+import dev.dbrada.ballistic_calculator.*;
 import dev.dbrada.ballistic_calculator.units.*;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -310,50 +307,63 @@ public class RegularCalculationForm {
 
         calculate.setOnAction(
                 (_) -> {
-                    Pressure pressureOut;
-                    if (altitudeOpt.isSelected()) {
-                        pressureOut = Physics.calculatePressure(new Length(((ObjectProperty<Double>) altitude[4]).getValue(), ((ChoiceBox<Length.ELength>) altitude[2]).getValue()));
-                    } else if (pressureOpt.isSelected()) {
-                        pressureOut = new Pressure(((ObjectProperty<Double>) pressure[4]).getValue(), ((ChoiceBox<Pressure.EPressure>) pressure[2]).getValue());
-                    } else {
-                        pressureOut = new Pressure(Constants.SEA_LEVEL_PRESSURE, Pressure.EPressure.PA);
-                    }
-                    List<Angle.EAngle> devAList = new ArrayList<>();
-                    for (CheckBox cb : deviationABoxes) {
-                        if (cb.isSelected()) {
-                            for (Angle.EAngle a : Angle.EAngle.values()) {
-                                if (a.getName().equalsIgnoreCase(cb.getText())) {
-                                    devAList.add(a);
-                                    break;
+                    Parameters parameters = null;
+                    BallisticCurve bc = null;
+
+                    try {
+                        Pressure pressureOut;
+                        if (altitudeOpt.isSelected()) {
+                            pressureOut = Physics.calculatePressure(new Length(((ObjectProperty<Double>) altitude[4]).getValue(), ((ChoiceBox<Length.ELength>) altitude[2]).getValue()));
+                        } else if (pressureOpt.isSelected()) {
+                            pressureOut = new Pressure(((ObjectProperty<Double>) pressure[4]).getValue(), ((ChoiceBox<Pressure.EPressure>) pressure[2]).getValue());
+                        } else {
+                            pressureOut = new Pressure(Constants.SEA_LEVEL_PRESSURE, Pressure.EPressure.PA);
+                        }
+                        List<Angle.EAngle> devAList = new ArrayList<>();
+                        for (CheckBox cb : deviationABoxes) {
+                            if (cb.isSelected()) {
+                                for (Angle.EAngle a : Angle.EAngle.values()) {
+                                    if (a.getName().equalsIgnoreCase(cb.getText())) {
+                                        devAList.add(a);
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                    Angle.EAngle[] devA = new Angle.EAngle[devAList.size()];
-                    for (int i = 0; i < devA.length; i++) {
-                        devA[i] = devAList.get(i);
+                        Angle.EAngle[] devA = new Angle.EAngle[devAList.size()];
+                        for (int i = 0; i < devA.length; i++) {
+                            devA[i] = devAList.get(i);
+                        }
+
+                        parameters = new Parameters(
+                                new Length(((ObjectProperty<Double>) diameter[4]).getValue(), ((ChoiceBox<Length.ELength>) diameter[2]).getValue()),
+                                new Mass(((ObjectProperty<Double>) mass[4]).getValue(), ((ChoiceBox<Mass.EMass>) mass[2]).getValue()),
+                                new Speed(((ObjectProperty<Double>) velocity[4]).getValue(), ((ChoiceBox<Speed.ESpeed>) velocity[2]).getValue()),
+                                new BallisticCoefficient(((ObjectProperty<Double>) balCoef[4]).getValue(), ((ChoiceBox<BallisticCoefficient.EBallisticCoefficient>) balCoef[2]).getValue()),
+                                new Length(((ObjectProperty<Double>) zeroRange[4]).getValue(), ((ChoiceBox<Length.ELength>) zeroRange[2]).getValue()),
+                                new Length(((ObjectProperty<Double>) sightHeight[4]).getValue(), ((ChoiceBox<Length.ELength>) sightHeight[2]).getValue()),
+                                new Length(((ObjectProperty<Double>) twistRate[4]).getValue(), ((ChoiceBox<Length.ELength>) twistRate[2]).getValue()),
+                                new Temperature(((ObjectProperty<Double>) temperature[4]).getValue(), ((ChoiceBox<Temperature.ETemperature>) temperature[2]).getValue()),
+                                ((ObjectProperty<Double>) humidity[4]).getValue(),
+                                new Speed(((ObjectProperty<Double>) windSpeed[4]).getValue(), ((ChoiceBox<Speed.ESpeed>) windSpeed[2]).getValue()),
+                                new Angle(((ObjectProperty<Double>) windAzimuth[4]).getValue(), ((ChoiceBox<Angle.EAngle>) windAzimuth[2]).getValue()),
+                                pressureOut,
+                                new Angle(((ObjectProperty<Double>) shotAngle[4]).getValue(), ((ChoiceBox<Angle.EAngle>) shotAngle[2]).getValue()),
+                                new Length(((ObjectProperty<Double>) maxRange[4]).getValue(), ((ChoiceBox<Length.ELength>) maxRange[2]).getValue()),
+                                new Length(((ObjectProperty<Double>) rangeStep[4]).getValue(), ((ChoiceBox<Length.ELength>) rangeStep[2]).getValue()),
+                                rangeUnitChoice.getValue(),
+                                deviationLChoice.getValue(),
+                                devA, othersTime.isSelected(), othersVelocity.isSelected()
+                        );
+
+                        bc = new BallisticCurve(Physics.positionIntegration(new Physics(parameters)));
+                    } catch (Exception e) {
+                        back.fire();
                     }
 
-                    Parameters parameters = new Parameters(
-                            new Length(((ObjectProperty<Double>) diameter[4]).getValue(), ((ChoiceBox<Length.ELength>) diameter[2]).getValue()),
-                            new Mass(((ObjectProperty<Double>) mass[4]).getValue(), ((ChoiceBox<Mass.EMass>) mass[2]).getValue()),
-                            new Speed(((ObjectProperty<Double>) velocity[4]).getValue(), ((ChoiceBox<Speed.ESpeed>) velocity[2]).getValue()),
-                            new BallisticCoefficient(((ObjectProperty<Double>) balCoef[4]).getValue(), ((ChoiceBox<BallisticCoefficient.EBallisticCoefficient>) balCoef[2]).getValue()),
-                            new Length(((ObjectProperty<Double>) zeroRange[4]).getValue(), ((ChoiceBox<Length.ELength>) zeroRange[2]).getValue()),
-                            new Length(((ObjectProperty<Double>) sightHeight[4]).getValue(), ((ChoiceBox<Length.ELength>) sightHeight[2]).getValue()),
-                            new Length(((ObjectProperty<Double>) twistRate[4]).getValue(), ((ChoiceBox<Length.ELength>) twistRate[2]).getValue()),
-                            new Temperature(((ObjectProperty<Double>) temperature[4]).getValue(), ((ChoiceBox<Temperature.ETemperature>) temperature[2]).getValue()),
-                            ((ObjectProperty<Double>) humidity[4]).getValue(),
-                            new Speed(((ObjectProperty<Double>) windSpeed[4]).getValue(), ((ChoiceBox<Speed.ESpeed>) windSpeed[2]).getValue()),
-                            new Angle(((ObjectProperty<Double>) windAzimuth[4]).getValue(), ((ChoiceBox<Angle.EAngle>) windAzimuth[2]).getValue()),
-                            pressureOut,
-                            new Angle(((ObjectProperty<Double>) shotAngle[4]).getValue(), ((ChoiceBox<Angle.EAngle>) shotAngle[2]).getValue()),
-                            new Length(((ObjectProperty<Double>) maxRange[4]).getValue(), ((ChoiceBox<Length.ELength>) maxRange[2]).getValue()),
-                            new Length(((ObjectProperty<Double>) rangeStep[4]).getValue(), ((ChoiceBox<Length.ELength>) rangeStep[2]).getValue()),
-                            rangeUnitChoice.getValue(),
-                            new Length.ELength[]{rangeUnitChoice.getValue()},
-                            devA, othersTime.isSelected(), othersVelocity.isSelected()
-                    );
+                    Stage current = (Stage) calculate.getScene().getWindow();
+                    DisplayBallisticTable display = new DisplayBallisticTable(previous, bc, parameters);
+                    current.setScene(display.getScene());
                 }
         );
         //

@@ -3,9 +3,11 @@ package dev.dbrada.ballistic_calculator;
 import dev.dbrada.ballistic_calculator.units.Angle;
 import dev.dbrada.ballistic_calculator.units.Length;
 import dev.dbrada.ballistic_calculator.units.Speed;
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class BallisticCurve {
 
     private final Node[] curve;
@@ -18,6 +20,7 @@ public class BallisticCurve {
         }
     }
 
+    @Getter
     public static class Node {
         private final Length xPos;
         private final Length yPos;

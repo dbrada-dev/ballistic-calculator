@@ -71,7 +71,7 @@ public class Menu extends Application {
 
 
 
-        Scene scene = new Scene(root, 640, 360);
+        Scene scene = new Scene(root, 1920/3.0, 1080*2/3.0);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/gui/" + UserSettings.colorPreset.getPrefix() + ".css")).toExternalForm());
 
         stage.setTitle("Ballistic Calculator");
