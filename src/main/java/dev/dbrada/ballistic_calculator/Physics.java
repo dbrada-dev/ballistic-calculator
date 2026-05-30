@@ -237,7 +237,7 @@ public class Physics {
     }
 
     private double angleOfDepartureRAD() {
-        Parameters p = new Parameters(param.diameter(), param.mass(), param.velocity(), param.balCoef(), param.zeroRange(), param.sightHeight(), param.twistRate(), new Temperature(15, Temperature.ETemperature.C), 50, new Speed(0, Speed.ESpeed.MPS), new Angle(0, Angle.EAngle.DEG), calculatePressure(new Length(250, Length.ELength.M)), new Angle(0, Angle.EAngle.DEG), param.zeroRange(), param.zeroRange(), null, null, false, false);
+        Parameters p = new Parameters(param.diameter(), param.mass(), param.velocity(), param.balCoef(), param.zeroRange(), param.sightHeight(), param.twistRate(), new Temperature(15, Temperature.ETemperature.C), 50, new Speed(0, Speed.ESpeed.MPS), new Angle(0, Angle.EAngle.DEG), calculatePressure(new Length(250, Length.ELength.M)), new Angle(0, Angle.EAngle.DEG), param.zeroRange(), param.zeroRange(), null,null, null, false, false);
         Physics estimationEnv = new Physics(p, false);
 
         double prevEstimatedAngleRAD = Math.atan(param.sightHeight().getM() / param.zeroRange().getM());

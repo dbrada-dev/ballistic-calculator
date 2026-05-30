@@ -1,6 +1,8 @@
 package dev.dbrada.ballistic_calculator.gui;
 
 import dev.dbrada.ballistic_calculator.Constants;
+import dev.dbrada.ballistic_calculator.Parameters;
+import dev.dbrada.ballistic_calculator.Physics;
 import dev.dbrada.ballistic_calculator.UserSettings;
 import dev.dbrada.ballistic_calculator.units.*;
 import javafx.beans.Observable;
@@ -60,74 +62,79 @@ public class RegularCalculationForm {
         scrollParams.setPrefSize(previous.getWidth()*0.95, previous.getHeight()-50);
         root.getChildren().add(scrollParams);
         //
+        //input label
+        Label inputs = new Label(UserSettings.getStr("inputs.label"));
+        inputs.setStyle("-fx-font-size: 20px");
+        params.add(inputs, 0, 0);
+        //
         //projectile
         //diameter
         Object[] diameter = diameterInit();
-        params.add((Label) diameter[0], 0, 0);
-        params.add((TextField) diameter[1], 1, 0);
-        params.add((ChoiceBox<Length.ELength>) diameter[2], 2, 0);
+        params.add((Label) diameter[0], 0, 1);
+        params.add((TextField) diameter[1], 1, 1);
+        params.add((ChoiceBox<Length.ELength>) diameter[2], 2, 1);
         //
         //mass
         Object[] mass = massInit();
-        params.add((Label) mass[0], 0, 1);
-        params.add((TextField) mass[1], 1 ,1);
-        params.add((ChoiceBox<Mass.EMass>) mass[2], 2, 1);
+        params.add((Label) mass[0], 0, 2);
+        params.add((TextField) mass[1], 1 ,2);
+        params.add((ChoiceBox<Mass.EMass>) mass[2], 2, 2);
         //
         //velocity
         Object[] velocity = velocityInit();
-        params.add((Label) velocity[0], 0, 2);
-        params.add((TextField) velocity[1], 1 ,2);
-        params.add((ChoiceBox<Speed.ESpeed>) velocity[2], 2, 2);
+        params.add((Label) velocity[0], 0, 3);
+        params.add((TextField) velocity[1], 1 ,3);
+        params.add((ChoiceBox<Speed.ESpeed>) velocity[2], 2, 3);
         //
         //ballistic coefficient
         Object[] balCoef = balCoefInit();
-        params.add((Label) balCoef[0], 0, 3);
-        params.add((TextField) balCoef[1], 1 ,3);
-        params.add((ChoiceBox<BallisticCoefficient.EBallisticCoefficient>) balCoef[2], 2, 3);
+        params.add((Label) balCoef[0], 0, 4);
+        params.add((TextField) balCoef[1], 1 ,4);
+        params.add((ChoiceBox<BallisticCoefficient.EBallisticCoefficient>) balCoef[2], 2, 4);
         //
         //
         //rifle setup
         //zero range
         Object[] zeroRange = zeroRangeInit();
-        params.add((Label) zeroRange[0], 0,4);
-        params.add((TextField) zeroRange[1], 1, 4);
-        params.add((ChoiceBox<Length.ELength>) zeroRange[2], 2, 4);
+        params.add((Label) zeroRange[0], 0,5);
+        params.add((TextField) zeroRange[1], 1, 5);
+        params.add((ChoiceBox<Length.ELength>) zeroRange[2], 2, 5);
         //
         //sight height
         Object[] sightHeight = sightHeightInit();
-        params.add((Label) sightHeight[0], 0, 5);
-        params.add((TextField) sightHeight[1], 1, 5);
-        params.add((ChoiceBox<Length.ELength>) sightHeight[2], 2, 5);
+        params.add((Label) sightHeight[0], 0, 6);
+        params.add((TextField) sightHeight[1], 1, 6);
+        params.add((ChoiceBox<Length.ELength>) sightHeight[2], 2, 6);
         //
         //twist rate
         Object[] twistRate = twistRateInit();
-        params.add((Label) twistRate[0], 0, 6);
-        params.add((TextField) twistRate[1], 1, 6);
-        params.add((ChoiceBox<Length.ELength>) twistRate[2], 2, 6);
+        params.add((Label) twistRate[0], 0, 7);
+        params.add((TextField) twistRate[1], 1, 7);
+        params.add((ChoiceBox<Length.ELength>) twistRate[2], 2, 7);
         //
         //temperature
         Object[] temperature = temperatureInit();
-        params.add((Label) temperature[0], 0, 7);
-        params.add((TextField) temperature[1], 1, 7);
-        params.add((ChoiceBox<Length.ELength>) temperature[2], 2, 7);
+        params.add((Label) temperature[0], 0, 8);
+        params.add((TextField) temperature[1], 1, 8);
+        params.add((ChoiceBox<Length.ELength>) temperature[2], 2, 8);
         //
         //humidity
         Object[] humidity = humidityInit();
-        params.add((Label) humidity[0], 0, 8);
-        params.add((TextField) humidity[1], 1, 8);
-        params.add((Label) humidity[2], 2, 8);
+        params.add((Label) humidity[0], 0, 9);
+        params.add((TextField) humidity[1], 1, 9);
+        params.add((Label) humidity[2], 2, 9);
         //
         //wind speed
         Object[] windSpeed = windSpeedInit();
-        params.add((Label) windSpeed[0], 0, 9);
-        params.add((TextField) windSpeed[1], 1, 9);
-        params.add((ChoiceBox<Speed.ESpeed>) windSpeed[2], 2, 9);
+        params.add((Label) windSpeed[0], 0, 10);
+        params.add((TextField) windSpeed[1], 1, 10);
+        params.add((ChoiceBox<Speed.ESpeed>) windSpeed[2], 2, 10);
         //
         //wind azimuth
         Object[] windAzimuth = windAzimuthInit();
-        params.add((Label) windAzimuth[0], 0, 10);
-        params.add(new VBox((TextField) windAzimuth[1], (Label) windAzimuth[5]), 1, 10);
-        params.add((ChoiceBox<Angle.EAngle>) windAzimuth[2], 2, 10);
+        params.add((Label) windAzimuth[0], 0, 11);
+        params.add(new VBox((TextField) windAzimuth[1], (Label) windAzimuth[5]), 1, 11);
+        params.add((ChoiceBox<Angle.EAngle>) windAzimuth[2], 2, 11);
         //
         //altitude/pressure
         ToggleGroup group = new ToggleGroup();
@@ -135,52 +142,123 @@ public class RegularCalculationForm {
         RadioButton pressureOpt = new RadioButton(UserSettings.getStr("pressure.opt"));
         altitudeOpt.setToggleGroup(group);
         pressureOpt.setToggleGroup(group);
-        params.add(altitudeOpt, 0, 11);
-        params.add(pressureOpt, 1, 11);
+        params.add(altitudeOpt, 0, 12);
+        params.add(pressureOpt, 1, 12);
 
         Object[] altitude = altitudeInit();
         Object[] pressure = pressureInit();
 
-        altitudeOpt.selectedProperty().addListener((observable, wasSelected, isSelected) -> {
+        altitudeOpt.selectedProperty().addListener((_, _, isSelected) -> {
             if (isSelected) {
                 params.getChildren().remove((Label) pressure[0]);
                 params.getChildren().remove((TextField) pressure[1]);
                 params.getChildren().remove((ChoiceBox<Pressure.EPressure>) pressure[2]);
-                params.add((Label) altitude[0], 0, 12);
-                params.add((TextField) altitude[1], 1, 12);
-                params.add((ChoiceBox<Length.ELength>) altitude[2], 2, 12);
+                params.add((Label) altitude[0], 0, 13);
+                params.add((TextField) altitude[1], 1, 13);
+                params.add((ChoiceBox<Length.ELength>) altitude[2], 2, 13);
             }
         });
-        pressureOpt.selectedProperty().addListener((observable, wasSelected, isSelected) -> {
+        pressureOpt.selectedProperty().addListener((_, _, isSelected) -> {
             if (isSelected) {
                 params.getChildren().remove((Label) altitude[0]);
                 params.getChildren().remove((TextField) altitude[1]);
                 params.getChildren().remove((ChoiceBox<Length.ELength>) altitude[2]);
-                params.add((Label) pressure[0], 0, 12);
-                params.add((TextField) pressure[1], 1, 12);
-                params.add((ChoiceBox<Pressure.EPressure>) pressure[2], 2, 12);
+                params.add((Label) pressure[0], 0, 13);
+                params.add((TextField) pressure[1], 1, 13);
+                params.add((ChoiceBox<Pressure.EPressure>) pressure[2], 2, 13);
             }
         });
         altitudeOpt.setSelected(true);
         //
         //shot angle
         Object[] shotAngle = shotAngleInit();
-        params.add((Label) shotAngle[0], 0, 13);
-        params.add(new VBox((TextField) shotAngle[1], (Label) shotAngle[5]), 1, 13);
-        params.add((ChoiceBox<Angle.EAngle>) shotAngle[2], 2, 13);
+        params.add((Label) shotAngle[0], 0, 14);
+        params.add(new VBox((TextField) shotAngle[1], (Label) shotAngle[5]), 1, 14);
+        params.add((ChoiceBox<Angle.EAngle>) shotAngle[2], 2, 14);
         //
         //max range
         Object[] maxRange = maxRangeInit();
-        params.add((Label) maxRange[0], 0,14);
-        params.add((TextField) maxRange[1], 1, 14);
-        params.add((ChoiceBox<Length.ELength>) maxRange[2], 2, 14);
+        params.add((Label) maxRange[0], 0,15);
+        params.add((TextField) maxRange[1], 1, 15);
+        params.add((ChoiceBox<Length.ELength>) maxRange[2], 2, 15);
         //
         //range step
         Object[] rangeStep = rangeStepInit();
-        params.add((Label) rangeStep[0], 0,15);
-        params.add((TextField) rangeStep[1], 1, 15);
-        params.add((ChoiceBox<Length.ELength>) rangeStep[2], 2, 15);
+        params.add((Label) rangeStep[0], 0,16);
+        params.add((TextField) rangeStep[1], 1, 16);
+        params.add((ChoiceBox<Length.ELength>) rangeStep[2], 2, 16);
         //
+        //
+        //output label
+        Label outputs = new Label(UserSettings.getStr("outputs.label"));
+        outputs.setStyle("-fx-font-size: 20px");
+        params.add(outputs, 0, 17);
+        //
+        //range units
+        Label rangeUnitLabel = new Label(UserSettings.getStr("range.label"));
+        ChoiceBox<Length.ELength> rangeUnitChoice = new ChoiceBox<>();
+        rangeUnitChoice.setPrefSize(100, 40);
+        rangeUnitChoice.getItems().addAll((Length.ELength[]) Constants.ALLOWED_UNITS.get("range"));
+        rangeUnitChoice.setValue((Length.ELength) UserSettings.defaultUnits.get("range"));
+        rangeUnitChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Length.ELength eLength) {
+                return eLength.getName();
+            }
+
+            @Override
+            public Length.ELength fromString(String s) {
+                for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("range")) {
+                    if (e.getName().equalsIgnoreCase(s)) return e;
+                }
+                return (Length.ELength) UserSettings.defaultUnits.get("range");
+            }
+        });
+        params.add(rangeUnitLabel, 0, 18);
+        params.add(rangeUnitChoice, 1, 18);
+        //
+        //deviation length
+        Label deviationLLabel = new Label(UserSettings.getStr("deviationL.label"));
+        ChoiceBox<Length.ELength> deviationLChoice = new ChoiceBox<>();
+        deviationLChoice.setPrefSize(100, 40);
+        deviationLChoice.getItems().addAll((Length.ELength[]) Constants.ALLOWED_UNITS.get("deviationL"));
+        deviationLChoice.setValue((Length.ELength) UserSettings.defaultUnits.get("deviationL"));
+        deviationLChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Length.ELength eLength) {
+                return eLength.getName();
+            }
+
+            @Override
+            public Length.ELength fromString(String s) {
+                for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("deviationL")) {
+                    if (e.getName().equalsIgnoreCase(s)) return e;
+                }
+                return (Length.ELength) UserSettings.defaultUnits.get("deviationL");
+            }
+        });
+        params.add(deviationLLabel, 0, 19);
+        params.add(deviationLChoice, 1, 19);
+        //
+        //deviation angle
+        Label deviationALabel = new Label(UserSettings.getStr("deviationA.label"));
+        params.add(deviationALabel, 0, 20);
+        CheckBox[] deviationABoxes = new CheckBox[Constants.ALLOWED_UNITS.get("deviationA").length];
+        for (int i = 0; i < deviationABoxes.length; i++) {
+            deviationABoxes[i] = new CheckBox(((Angle.EAngle) Constants.ALLOWED_UNITS.get("deviationA")[i]).getName());
+            if (((Angle.EAngle) Constants.ALLOWED_UNITS.get("deviationA")[i]).getName().equalsIgnoreCase(((Angle.EAngle) UserSettings.defaultUnits.get("deviationA")).getName())) {
+                deviationABoxes[i].setSelected(true);
+            }
+            params.add(deviationABoxes[i], i+1, 20);
+        }
+        //
+        //other params
+        Label othersLabel = new Label(UserSettings.getStr("others.label"));
+        CheckBox othersTime = new CheckBox(UserSettings.getStr("time.box"));
+        CheckBox othersVelocity = new CheckBox(UserSettings.getStr("velocity.box"));
+        params.add(othersLabel, 0, 21);
+        params.add(othersTime, 1, 21);
+        params.add(othersVelocity, 2, 21);
         //
         //
 
@@ -228,9 +306,54 @@ public class RegularCalculationForm {
             return true;
         }, dependencies.toArray(new Observable[0]));
 
+        calculate.disableProperty().bind(disableCalculate);
+
         calculate.setOnAction(
                 (_) -> {
-                    System.out.println(disableCalculate.get());
+                    Pressure pressureOut;
+                    if (altitudeOpt.isSelected()) {
+                        pressureOut = Physics.calculatePressure(new Length(((ObjectProperty<Double>) altitude[4]).getValue(), ((ChoiceBox<Length.ELength>) altitude[2]).getValue()));
+                    } else if (pressureOpt.isSelected()) {
+                        pressureOut = new Pressure(((ObjectProperty<Double>) pressure[4]).getValue(), ((ChoiceBox<Pressure.EPressure>) pressure[2]).getValue());
+                    } else {
+                        pressureOut = new Pressure(Constants.SEA_LEVEL_PRESSURE, Pressure.EPressure.PA);
+                    }
+                    List<Angle.EAngle> devAList = new ArrayList<>();
+                    for (CheckBox cb : deviationABoxes) {
+                        if (cb.isSelected()) {
+                            for (Angle.EAngle a : Angle.EAngle.values()) {
+                                if (a.getName().equalsIgnoreCase(cb.getText())) {
+                                    devAList.add(a);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    Angle.EAngle[] devA = new Angle.EAngle[devAList.size()];
+                    for (int i = 0; i < devA.length; i++) {
+                        devA[i] = devAList.get(i);
+                    }
+
+                    Parameters parameters = new Parameters(
+                            new Length(((ObjectProperty<Double>) diameter[4]).getValue(), ((ChoiceBox<Length.ELength>) diameter[2]).getValue()),
+                            new Mass(((ObjectProperty<Double>) mass[4]).getValue(), ((ChoiceBox<Mass.EMass>) mass[2]).getValue()),
+                            new Speed(((ObjectProperty<Double>) velocity[4]).getValue(), ((ChoiceBox<Speed.ESpeed>) velocity[2]).getValue()),
+                            new BallisticCoefficient(((ObjectProperty<Double>) balCoef[4]).getValue(), ((ChoiceBox<BallisticCoefficient.EBallisticCoefficient>) balCoef[2]).getValue()),
+                            new Length(((ObjectProperty<Double>) zeroRange[4]).getValue(), ((ChoiceBox<Length.ELength>) zeroRange[2]).getValue()),
+                            new Length(((ObjectProperty<Double>) sightHeight[4]).getValue(), ((ChoiceBox<Length.ELength>) sightHeight[2]).getValue()),
+                            new Length(((ObjectProperty<Double>) twistRate[4]).getValue(), ((ChoiceBox<Length.ELength>) twistRate[2]).getValue()),
+                            new Temperature(((ObjectProperty<Double>) temperature[4]).getValue(), ((ChoiceBox<Temperature.ETemperature>) temperature[2]).getValue()),
+                            ((ObjectProperty<Double>) humidity[4]).getValue(),
+                            new Speed(((ObjectProperty<Double>) windSpeed[4]).getValue(), ((ChoiceBox<Speed.ESpeed>) windSpeed[2]).getValue()),
+                            new Angle(((ObjectProperty<Double>) windAzimuth[4]).getValue(), ((ChoiceBox<Angle.EAngle>) windAzimuth[2]).getValue()),
+                            pressureOut,
+                            new Angle(((ObjectProperty<Double>) shotAngle[4]).getValue(), ((ChoiceBox<Angle.EAngle>) shotAngle[2]).getValue()),
+                            new Length(((ObjectProperty<Double>) maxRange[4]).getValue(), ((ChoiceBox<Length.ELength>) maxRange[2]).getValue()),
+                            new Length(((ObjectProperty<Double>) rangeStep[4]).getValue(), ((ChoiceBox<Length.ELength>) rangeStep[2]).getValue()),
+                            rangeUnitChoice.getValue(),
+                            new Length.ELength[]{rangeUnitChoice.getValue()},
+                            devA, othersTime.isSelected(), othersVelocity.isSelected()
+                    );
                 }
         );
         //
@@ -260,7 +383,7 @@ public class RegularCalculationForm {
             @Override
             public Length.ELength fromString(String s) {
                 for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("diameter")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Length.ELength) UserSettings.defaultUnits.get("diameter");
             }
@@ -273,7 +396,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> diameterValue = new SimpleObjectProperty<>(null);
 
         diameterChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         diameterText.setPromptText(Math.ceil(min.get(diameterChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(diameterChoice.getValue(), 3)*100)/100.0);
                     }
@@ -288,7 +411,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        diameterText.textProperty().addListener((observable, oldValue, newValue) -> {
+        diameterText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 diameterValue.set(Double.parseDouble(newValue));
@@ -334,7 +457,7 @@ public class RegularCalculationForm {
             @Override
             public Mass.EMass fromString(String s) {
                 for (Mass.EMass e: (Mass.EMass[]) Constants.ALLOWED_UNITS.get("mass")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Mass.EMass) UserSettings.defaultUnits.get("mass");
             }
@@ -347,7 +470,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> massValue = new SimpleObjectProperty<>(null);
 
         massChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         massText.setPromptText(Math.ceil(min.get(massChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(massChoice.getValue(), 3)*100)/100.0);
                     }
@@ -362,7 +485,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        massText.textProperty().addListener((observable, oldValue, newValue) -> {
+        massText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 massValue.set(Double.parseDouble(newValue));
@@ -408,7 +531,7 @@ public class RegularCalculationForm {
             @Override
             public Speed.ESpeed fromString(String s) {
                 for (Speed.ESpeed e: (Speed.ESpeed[]) Constants.ALLOWED_UNITS.get("velocity")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Speed.ESpeed) UserSettings.defaultUnits.get("velocity");
             }
@@ -421,7 +544,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> velocityValue = new SimpleObjectProperty<>(null);
 
         velocityChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         velocityText.setPromptText(Math.ceil(min.get(velocityChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(velocityChoice.getValue(), 3)*100)/100.0);
                     }
@@ -436,7 +559,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        velocityText.textProperty().addListener((observable, oldValue, newValue) -> {
+        velocityText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 velocityValue.set(Double.parseDouble(newValue));
@@ -482,7 +605,7 @@ public class RegularCalculationForm {
             @Override
             public BallisticCoefficient.EBallisticCoefficient fromString(String s) {
                 for (BallisticCoefficient.EBallisticCoefficient e: (BallisticCoefficient.EBallisticCoefficient[]) Constants.ALLOWED_UNITS.get("balCoef")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (BallisticCoefficient.EBallisticCoefficient) UserSettings.defaultUnits.get("balCoef");
             }
@@ -495,7 +618,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> balCoefValue = new SimpleObjectProperty<>(null);
 
         balCoefChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         balCoefText.setPromptText(min + " - " + max);
                     }
@@ -510,7 +633,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        balCoefText.textProperty().addListener((observable, oldValue, newValue) -> {
+        balCoefText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 balCoefValue.set(Double.parseDouble(newValue));
@@ -556,7 +679,7 @@ public class RegularCalculationForm {
             @Override
             public Length.ELength fromString(String s) {
                 for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("zeroRange")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Length.ELength) UserSettings.defaultUnits.get("zeroRange");
             }
@@ -569,7 +692,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> zeroRangeValue = new SimpleObjectProperty<>(null);
 
         zeroRangeChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         zeroRangeText.setPromptText(Math.ceil(min.get(zeroRangeChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(zeroRangeChoice.getValue(), 3)*100)/100.0);
                     }
@@ -584,7 +707,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        zeroRangeText.textProperty().addListener((observable, oldValue, newValue) -> {
+        zeroRangeText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 zeroRangeValue.set(Double.parseDouble(newValue));
@@ -630,7 +753,7 @@ public class RegularCalculationForm {
             @Override
             public Length.ELength fromString(String s) {
                 for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("sightHeight")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Length.ELength) UserSettings.defaultUnits.get("sightHeight");
             }
@@ -643,7 +766,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> sightHeightValue = new SimpleObjectProperty<>(null);
 
         sightHeightChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         sightHeightText.setPromptText(Math.ceil(min.get(sightHeightChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(sightHeightChoice.getValue(), 3)*100)/100.0);
                     }
@@ -658,7 +781,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        sightHeightText.textProperty().addListener((observable, oldValue, newValue) -> {
+        sightHeightText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 sightHeightValue.set(Double.parseDouble(newValue));
@@ -704,7 +827,7 @@ public class RegularCalculationForm {
             @Override
             public Length.ELength fromString(String s) {
                 for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("twistRate")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Length.ELength) UserSettings.defaultUnits.get("twistRate");
             }
@@ -717,7 +840,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> twistRateValue = new SimpleObjectProperty<>(null);
 
         twistRateChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         twistRateText.setPromptText(Math.ceil(min.get(twistRateChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(twistRateChoice.getValue(), 3)*100)/100.0);
                     }
@@ -732,7 +855,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        twistRateText.textProperty().addListener((observable, oldValue, newValue) -> {
+        twistRateText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 twistRateValue.set(Double.parseDouble(newValue));
@@ -778,7 +901,7 @@ public class RegularCalculationForm {
             @Override
             public Temperature.ETemperature fromString(String s) {
                 for (Temperature.ETemperature e: (Temperature.ETemperature[]) Constants.ALLOWED_UNITS.get("temperature")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Temperature.ETemperature) UserSettings.defaultUnits.get("temperature");
             }
@@ -791,7 +914,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> temperatureValue = new SimpleObjectProperty<>(null);
 
         temperatureChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         temperatureText.setPromptText(Math.ceil(min.get(temperatureChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(temperatureChoice.getValue(), 3)*100)/100.0);
                     }
@@ -806,7 +929,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        temperatureText.textProperty().addListener((observable, oldValue, newValue) -> {
+        temperatureText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 temperatureValue.set(Double.parseDouble(newValue));
@@ -855,7 +978,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        humidityText.textProperty().addListener((observable, oldValue, newValue) -> {
+        humidityText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 humidityValue.set(Double.parseDouble(newValue));
@@ -901,7 +1024,7 @@ public class RegularCalculationForm {
             @Override
             public Speed.ESpeed fromString(String s) {
                 for (Speed.ESpeed e: (Speed.ESpeed[]) Constants.ALLOWED_UNITS.get("windSpeed")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Speed.ESpeed) UserSettings.defaultUnits.get("windSpeed");
             }
@@ -914,7 +1037,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> windSpeedValue = new SimpleObjectProperty<>(null);
 
         windSpeedChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         windSpeedText.setPromptText(Math.ceil(min.get(windSpeedChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(windSpeedChoice.getValue(), 3)*100)/100.0);
                     }
@@ -929,7 +1052,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        windSpeedText.textProperty().addListener((observable, oldValue, newValue) -> {
+        windSpeedText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 windSpeedValue.set(Double.parseDouble(newValue));
@@ -975,7 +1098,7 @@ public class RegularCalculationForm {
             @Override
             public Angle.EAngle fromString(String s) {
                 for (Angle.EAngle e: (Angle.EAngle[]) Constants.ALLOWED_UNITS.get("windAzimuth")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Angle.EAngle) UserSettings.defaultUnits.get("windAzimuth");
             }
@@ -988,7 +1111,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> windAzimuthValue = new SimpleObjectProperty<>(null);
 
         windAzimuthChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         windAzimuthText.setPromptText(Math.ceil(min.get(windAzimuthChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(windAzimuthChoice.getValue(), 3)*100)/100.0);
                     }
@@ -1003,7 +1126,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        windAzimuthText.textProperty().addListener((observable, oldValue, newValue) -> {
+        windAzimuthText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 windAzimuthValue.set(Double.parseDouble(newValue));
@@ -1053,7 +1176,7 @@ public class RegularCalculationForm {
             @Override
             public Length.ELength fromString(String s) {
                 for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("altitude")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Length.ELength) UserSettings.defaultUnits.get("altitude");
             }
@@ -1066,7 +1189,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> altitudeValue = new SimpleObjectProperty<>(null);
 
         altitudeChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         altitudeText.setPromptText(Math.ceil(min.get(altitudeChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(altitudeChoice.getValue(), 3)*100)/100.0);
                     }
@@ -1081,7 +1204,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        altitudeText.textProperty().addListener((observable, oldValue, newValue) -> {
+        altitudeText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 altitudeValue.set(Double.parseDouble(newValue));
@@ -1127,7 +1250,7 @@ public class RegularCalculationForm {
             @Override
             public Pressure.EPressure fromString(String s) {
                 for (Pressure.EPressure e: (Pressure.EPressure[]) Constants.ALLOWED_UNITS.get("pressure")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Pressure.EPressure) UserSettings.defaultUnits.get("pressure");
             }
@@ -1140,7 +1263,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> pressureValue = new SimpleObjectProperty<>(null);
 
         pressureChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         pressureText.setPromptText(Math.ceil(min.get(pressureChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(pressureChoice.getValue(), 3)*100)/100.0);
                     }
@@ -1155,7 +1278,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        pressureText.textProperty().addListener((observable, oldValue, newValue) -> {
+        pressureText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 pressureValue.set(Double.parseDouble(newValue));
@@ -1201,7 +1324,7 @@ public class RegularCalculationForm {
             @Override
             public Angle.EAngle fromString(String s) {
                 for (Angle.EAngle e: (Angle.EAngle[]) Constants.ALLOWED_UNITS.get("shotAngle")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Angle.EAngle) UserSettings.defaultUnits.get("shotAngle");
             }
@@ -1214,7 +1337,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> shotAngleValue = new SimpleObjectProperty<>(null);
 
         shotAngleChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         shotAngleText.setPromptText(Math.ceil(min.get(shotAngleChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(shotAngleChoice.getValue(), 3)*100)/100.0);
                     }
@@ -1229,7 +1352,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        shotAngleText.textProperty().addListener((observable, oldValue, newValue) -> {
+        shotAngleText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 shotAngleValue.set(Double.parseDouble(newValue));
@@ -1279,7 +1402,7 @@ public class RegularCalculationForm {
             @Override
             public Length.ELength fromString(String s) {
                 for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("maxRange")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Length.ELength) UserSettings.defaultUnits.get("maxRange");
             }
@@ -1292,7 +1415,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> maxRangeValue = new SimpleObjectProperty<>(null);
 
         maxRangeChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         maxRangeText.setPromptText(Math.ceil(min.get(maxRangeChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(maxRangeChoice.getValue(), 3)*100)/100.0);
                     }
@@ -1307,7 +1430,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        maxRangeText.textProperty().addListener((observable, oldValue, newValue) -> {
+        maxRangeText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 maxRangeValue.set(Double.parseDouble(newValue));
@@ -1353,7 +1476,7 @@ public class RegularCalculationForm {
             @Override
             public Length.ELength fromString(String s) {
                 for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("rangeStep")) {
-                    if (e.getName().equalsIgnoreCase("s")) return e;
+                    if (e.getName().equalsIgnoreCase(s)) return e;
                 }
                 return (Length.ELength) UserSettings.defaultUnits.get("rangeStep");
             }
@@ -1366,7 +1489,7 @@ public class RegularCalculationForm {
         ObjectProperty<Double> rangeStepValue = new SimpleObjectProperty<>(null);
 
         rangeStepChoice.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, oldValue, newValue) -> {
                     if (newValue != oldValue) {
                         rangeStepText.setPromptText(Math.ceil(min.get(rangeStepChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(rangeStepChoice.getValue(), 3)*100)/100.0);
                     }
@@ -1381,7 +1504,7 @@ public class RegularCalculationForm {
             return null;
         }));
 
-        rangeStepText.textProperty().addListener((observable, oldValue, newValue) -> {
+        rangeStepText.textProperty().addListener((_, _, newValue) -> {
             newValue = newValue.replace(',','.');
             try {
                 rangeStepValue.set(Double.parseDouble(newValue));
