@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 
 @Data
-@AllArgsConstructor
 public class Physics {
     private Parameters param;
 
@@ -36,28 +35,41 @@ public class Physics {
         this.angleOfDepartureRAD = angleOfDepartureRAD();
     }
 
+    public Physics(Parameters param, boolean noAngleOfDeparture) {
+        this.param = param;
+        this.vaporPressure = vaporPressure();
+        this.airDensityKGPM3 = airDensityKGPM3();
+        this.speedOfSound = speedOfSound();
+        this.frontalAreaM2 = frontalAreaM2();
+        this.formFactor = formFactor();
+        this.stabilityFactor = stabilityFactor();
+        this.dragCoefStd = dragCoefStd();
+        this.angleOfDepartureRAD = 0;
+    }
+
     public static LinkedList<double[]> positionIntegration(Physics p) {
         //0-X,1-Y,2-Z
         double[] pos = new double[]{0,0,0};
         double[] velocity = new double[]{
-                p.param.getVelocity().getMPS()*Math.cos(p.angleOfDepartureRAD),
-                p.param.getVelocity().getMPS()*Math.sin(p.angleOfDepartureRAD),
+                p.param.velocity().getMPS()*Math.cos(p.angleOfDepartureRAD),
+                p.param.velocity().getMPS()*Math.sin(p.angleOfDepartureRAD),
                 0
         };
         //0-X,1-Z
         double[] wind = new double[]{
-                p.param.getWindSpeed().getMPS()*Math.cos(p.param.getWindAzimuth().getRAD()),
-                p.param.getWindSpeed().getMPS()*Math.sin(p.param.getWindAzimuth().getRAD())
+                p.param.windSpeed().getMPS()*Math.cos(p.param.windAzimuth().getRAD()),
+                p.param.windSpeed().getMPS()*Math.sin(p.param.windAzimuth().getRAD())
         };
         //0-X,1-Y
         double[] gravity = new double[]{
-                Constants.GRAVITY*Math.sin(p.param.getShotAngle().getRAD()),
-                Constants.GRAVITY*Math.cos(p.param.getShotAngle().getRAD())
+                Constants.GRAVITY*Math.sin(p.param.shotAngle().getRAD()),
+                Constants.GRAVITY*Math.cos(p.param.shotAngle().getRAD())
         };
 
         int[] prevIndex = new int[]{-2};
         int i = 0;
-        double nextTarget = p.param.getRangeStep().getM();
+        //if max < step
+        double nextTarget = Math.min(p.param.rangeStep().getM(), p.param.maxRange().getM());
 
         LinkedList<double[]> result = new LinkedList<>();
 
@@ -91,12 +103,12 @@ public class Physics {
             while (pos[0] > nextTarget) {
                 result.add(new double[]{
                         nextTarget, currentTime,
-                        pos[0],pos[1]-p.param.getSightHeight().getM(),pos[2]+p.spinDrift(currentTime).getM(),
+                        pos[0],pos[1]-p.param.sightHeight().getM(),pos[2]+p.spinDrift(currentTime).getM(),
                         velocity[0],velocity[1],velocity[2]
                 });
-                nextTarget += p.param.getRangeStep().getM();
+                nextTarget += p.param.rangeStep().getM();
             }
-        } while (pos[0]<p.param.getMaxRange().getM());
+        } while (pos[0]<p.param.maxRange().getM() && velocity[0] > 0.5);
 
         return result;
     }
@@ -104,7 +116,7 @@ public class Physics {
 //█ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█ █░▀█ ░█░ ██▄ █▄█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
     private double dragDeceleration(double velocityMPS, int[] prevIndex) {
-        return (airDensityKGPM3 * velocityMPS * velocityMPS * (frontalAreaM2 * (formFactor * getDragCoef(velocityMPS, prevIndex))))/(2*param.getMass().getKG());
+        return (airDensityKGPM3 * velocityMPS * velocityMPS * (frontalAreaM2 * (formFactor * getDragCoef(velocityMPS, prevIndex))))/(2*param.mass().getKG());
     }
 
     private double getDragCoef(double velocityMPS, int[] prevIndex) {
@@ -161,49 +173,49 @@ public class Physics {
 //█▀█ █▀█ █▀ ▀█▀ ▄▄ █ █▄░█ ▀█▀ █▀▀ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //█▀▀ █▄█ ▄█ ░█░ ░░ █ █░▀█ ░█░ ██▄ █▄█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
     private Length spinDrift(double timeS) {
-        double value = Math.signum(param.getTwistRate().getValue()) * 1.25*(stabilityFactor + 1.2)*Math.pow(timeS, 1.83);
+        double value = Math.signum(param.twistRate().getValue()) * 1.25*(stabilityFactor + 1.2)*Math.pow(timeS, 1.83);
         return new Length(value, Length.ELength.IN);
     }
 
 //█▀▀ ▀▄▀ █▀▀ █▀▀ ▄▄ █▀█ █▄░█ █▀▀ █▀▀  █▀▀ █▀█ █▀█ █▀▄▀█ █░█ █░░ ▄▀█ █▀
 //██▄ █░█ ██▄ █▄▄ ░░ █▄█ █░▀█ █▄▄ ██▄  █▀░ █▄█ █▀▄ █░▀░█ █▄█ █▄▄ █▀█ ▄█
     private Pressure vaporPressure() {
-        double saturationVaporPressure = Constants.SATURATION_WATER_PRESSURE * Math.exp(Constants.EMPIRICAL_WATER_VAPOR_CONSTANT*param.getTemperature().getC()/(Constants.TEMPERATURE_SCALING_CONSTANT+param.getTemperature().getC()));
-        double value = param.getHumidity()/100 * saturationVaporPressure;
+        double saturationVaporPressure = Constants.SATURATION_WATER_PRESSURE * Math.exp(Constants.EMPIRICAL_WATER_VAPOR_CONSTANT*param.temperature().getC()/(Constants.TEMPERATURE_SCALING_CONSTANT+param.temperature().getC()));
+        double value = param.humidity()/100 * saturationVaporPressure;
         return new Pressure(value, Pressure.EPressure.PA);
     }
 
     private double airDensityKGPM3() {
-        return (param.getPressure().getPA()-Constants.VAPOR_PRESSURE_FACTOR*vaporPressure.getPA())/(Constants.AIR_GAS_CONSTANT*param.getTemperature().getK());
+        return (param.pressure().getPA()-Constants.VAPOR_PRESSURE_FACTOR*vaporPressure.getPA())/(Constants.AIR_GAS_CONSTANT*param.temperature().getK());
     }
 
     private Speed speedOfSound() {
-        double virtualTemperature = param.getTemperature().getK()/(1-Constants.VAPOR_PRESSURE_FACTOR*(vaporPressure.getPA()/param.getPressure().getPA()));
+        double virtualTemperature = param.temperature().getK()/(1-Constants.VAPOR_PRESSURE_FACTOR*(vaporPressure.getPA()/param.pressure().getPA()));
         double value = Math.sqrt(Constants.DRY_AIR_HEAT_CAPACITY*Constants.AIR_GAS_CONSTANT*virtualTemperature);
         return new Speed(value, Speed.ESpeed.MPS);
     }
 
     private double frontalAreaM2() {
-        return Math.PI * param.getDiameter().getM()*param.getDiameter().getM()/4;
+        return Math.PI * param.diameter().getM()*param.diameter().getM()/4;
     }
 
     private double formFactor() {
-        double sectionalDensityLBPIN2 = param.getMass().getLB()/(param.getDiameter().getIN()*param.getDiameter().getIN());
-        return sectionalDensityLBPIN2/param.getBalCoef().getValue();
+        double sectionalDensityLBPIN2 = param.mass().getLB()/(param.diameter().getIN()*param.diameter().getIN());
+        return sectionalDensityLBPIN2/param.balCoef().getValue();
     }
 
     private double stabilityFactor() {
-        if (param.getTwistRate().getValue() == 0) return 0;
-        double bulletLengthCAL = param.getMass().getKG()/(Constants.BULLET_VOLUME_FACTOR*Constants.BULLET_DENSITY*frontalAreaM2)/param.getDiameter().getM();
-        double twistRateCAL = param.getTwistRate().getM()/param.getDiameter().getM();
-        double fixedStabilityFactor = 30*param.getMass().getGR()/(twistRateCAL*twistRateCAL*param.getDiameter().getIN()*param.getDiameter().getIN()*param.getDiameter().getIN()*bulletLengthCAL*(1+bulletLengthCAL*bulletLengthCAL));
+        if (param.twistRate().getValue() == 0) return 0;
+        double bulletLengthCAL = param.mass().getKG()/(Constants.BULLET_VOLUME_FACTOR*Constants.BULLET_DENSITY*frontalAreaM2)/param.diameter().getM();
+        double twistRateCAL = param.twistRate().getM()/param.diameter().getM();
+        double fixedStabilityFactor = 30*param.mass().getGR()/(twistRateCAL*twistRateCAL*param.diameter().getIN()*param.diameter().getIN()*param.diameter().getIN()*bulletLengthCAL*(1+bulletLengthCAL*bulletLengthCAL));
         double densityCorrection = Constants.SEA_LEVEL_AIR_DENSITY/airDensityKGPM3;
-        double velocityCorrection = Math.cbrt(param.getVelocity().getFPS()/2800);
+        double velocityCorrection = Math.cbrt(param.velocity().getFPS()/2800);
         return fixedStabilityFactor*densityCorrection*velocityCorrection;
     }
 
     private double[][] dragCoefStd() {
-        try(InputStream in = getClass().getResourceAsStream(param.getBalCoef().getType().getResource())) {
+        try(InputStream in = getClass().getResourceAsStream(param.balCoef().getType().getResource())) {
             if (in == null) throw new IOException("No resource found");
             BufferedReader rd = new BufferedReader(new InputStreamReader(in));
             String line;
@@ -225,17 +237,14 @@ public class Physics {
     }
 
     private double angleOfDepartureRAD() {
-        Parameters p = param.copy();
-        p.setMaxRange(param.getZeroRange());
-        p.setRangeStep(param.getZeroRange());
-        Physics estimationEnv = this.copy();
-        estimationEnv.setParam(p);
+        Parameters p = new Parameters(param.diameter(), param.mass(), param.velocity(), param.balCoef(), param.zeroRange(), param.sightHeight(), param.twistRate(), new Temperature(15, Temperature.ETemperature.C), 50, new Speed(0, Speed.ESpeed.MPS), new Angle(0, Angle.EAngle.DEG), calculatePressure(new Length(250, Length.ELength.M)), new Angle(0, Angle.EAngle.DEG), param.zeroRange(), param.zeroRange(), null, null, false, false);
+        Physics estimationEnv = new Physics(p, false);
 
-        double prevEstimatedAngleRAD = Math.atan(param.getSightHeight().getM() / param.getZeroRange().getM());
+        double prevEstimatedAngleRAD = Math.atan(param.sightHeight().getM() / param.zeroRange().getM());
         estimationEnv.setAngleOfDepartureRAD(prevEstimatedAngleRAD);
         double prevError = positionIntegration(estimationEnv).getFirst()[3];
 
-        double estimatedAngleRAD = prevEstimatedAngleRAD + Math.asin((Constants.GRAVITY * param.getZeroRange().getM())/(param.getVelocity().getMPS() * param.getVelocity().getMPS()));
+        double estimatedAngleRAD = prevEstimatedAngleRAD + Math.asin((Constants.GRAVITY * param.zeroRange().getM())/(param.velocity().getMPS() * param.velocity().getMPS()));
         estimationEnv.setAngleOfDepartureRAD(estimatedAngleRAD);
         double error;
 
@@ -247,7 +256,7 @@ public class Physics {
                 return estimatedAngleRAD;
             }
             i++;
-            if(i > 2000) throw new IllegalStateException("Zero angle could not been found");
+            if(i > 200) throw new IllegalStateException("Zero angle could not been found");
 
             double tmp = estimatedAngleRAD;
             estimatedAngleRAD -= error*(estimatedAngleRAD - prevEstimatedAngleRAD)/(error - prevError);
@@ -262,9 +271,5 @@ public class Physics {
     public static Pressure calculatePressure(Length altitude) {
         double value = Constants.SEA_LEVEL_PRESSURE * Math.pow(1.0-Constants.TEMPERATURE_LAPS_RATE*altitude.getM()/Constants.SEA_LEVEL_TEMPERATURE, Constants.GRAVITY*Constants.AIR_MOLAR_MASS/(Constants.GAS_CONSTANT*Constants.TEMPERATURE_LAPS_RATE));
         return new Pressure(value, Pressure.EPressure.PA);
-    }
-
-    public Physics copy() {
-        return new Physics(param, vaporPressure, airDensityKGPM3, speedOfSound, frontalAreaM2, formFactor, stabilityFactor, dragCoefStd, angleOfDepartureRAD);
     }
 }

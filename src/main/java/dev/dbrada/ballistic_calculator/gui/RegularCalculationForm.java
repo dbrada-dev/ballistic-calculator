@@ -3,10 +3,12 @@ package dev.dbrada.ballistic_calculator.gui;
 import dev.dbrada.ballistic_calculator.Constants;
 import dev.dbrada.ballistic_calculator.UserSettings;
 import dev.dbrada.ballistic_calculator.units.*;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +19,9 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @AllArgsConstructor
@@ -75,10 +80,12 @@ public class RegularCalculationForm {
         params.add((ChoiceBox<Speed.ESpeed>) velocity[2], 2, 2);
         //
         //ballistic coefficient
-            //TODO
+        Object[] balCoef = balCoefInit();
+        params.add((Label) balCoef[0], 0, 3);
+        params.add((TextField) balCoef[1], 1 ,3);
+        params.add((ChoiceBox<BallisticCoefficient.EBallisticCoefficient>) balCoef[2], 2, 3);
         //
         //
-
         //rifle setup
         //zero range
         Object[] zeroRange = zeroRangeInit();
@@ -92,57 +99,89 @@ public class RegularCalculationForm {
         params.add((TextField) sightHeight[1], 1, 5);
         params.add((ChoiceBox<Length.ELength>) sightHeight[2], 2, 5);
         //
-
         //twist rate
         Object[] twistRate = twistRateInit();
         params.add((Label) twistRate[0], 0, 6);
         params.add((TextField) twistRate[1], 1, 6);
         params.add((ChoiceBox<Length.ELength>) twistRate[2], 2, 6);
         //
-
         //temperature
         Object[] temperature = temperatureInit();
         params.add((Label) temperature[0], 0, 7);
         params.add((TextField) temperature[1], 1, 7);
         params.add((ChoiceBox<Length.ELength>) temperature[2], 2, 7);
         //
-
         //humidity
         Object[] humidity = humidityInit();
         params.add((Label) humidity[0], 0, 8);
         params.add((TextField) humidity[1], 1, 8);
         params.add((Label) humidity[2], 2, 8);
         //
-
         //wind speed
         Object[] windSpeed = windSpeedInit();
         params.add((Label) windSpeed[0], 0, 9);
         params.add((TextField) windSpeed[1], 1, 9);
         params.add((ChoiceBox<Speed.ESpeed>) windSpeed[2], 2, 9);
         //
-
         //wind azimuth
         Object[] windAzimuth = windAzimuthInit();
         params.add((Label) windAzimuth[0], 0, 10);
         params.add(new VBox((TextField) windAzimuth[1], (Label) windAzimuth[5]), 1, 10);
         params.add((ChoiceBox<Angle.EAngle>) windAzimuth[2], 2, 10);
         //
-
         //altitude/pressure
         ToggleGroup group = new ToggleGroup();
         RadioButton altitudeOpt = new RadioButton(UserSettings.getStr("altitude.opt"));
         RadioButton pressureOpt = new RadioButton(UserSettings.getStr("pressure.opt"));
         altitudeOpt.setToggleGroup(group);
         pressureOpt.setToggleGroup(group);
-        altitudeOpt.setSelected(true);
         params.add(altitudeOpt, 0, 11);
         params.add(pressureOpt, 1, 11);
 
+        Object[] altitude = altitudeInit();
+        Object[] pressure = pressureInit();
+
+        altitudeOpt.selectedProperty().addListener((observable, wasSelected, isSelected) -> {
+            if (isSelected) {
+                params.getChildren().remove((Label) pressure[0]);
+                params.getChildren().remove((TextField) pressure[1]);
+                params.getChildren().remove((ChoiceBox<Pressure.EPressure>) pressure[2]);
+                params.add((Label) altitude[0], 0, 12);
+                params.add((TextField) altitude[1], 1, 12);
+                params.add((ChoiceBox<Length.ELength>) altitude[2], 2, 12);
+            }
+        });
+        pressureOpt.selectedProperty().addListener((observable, wasSelected, isSelected) -> {
+            if (isSelected) {
+                params.getChildren().remove((Label) altitude[0]);
+                params.getChildren().remove((TextField) altitude[1]);
+                params.getChildren().remove((ChoiceBox<Length.ELength>) altitude[2]);
+                params.add((Label) pressure[0], 0, 12);
+                params.add((TextField) pressure[1], 1, 12);
+                params.add((ChoiceBox<Pressure.EPressure>) pressure[2], 2, 12);
+            }
+        });
+        altitudeOpt.setSelected(true);
         //
-
-
+        //shot angle
+        Object[] shotAngle = shotAngleInit();
+        params.add((Label) shotAngle[0], 0, 13);
+        params.add(new VBox((TextField) shotAngle[1], (Label) shotAngle[5]), 1, 13);
+        params.add((ChoiceBox<Angle.EAngle>) shotAngle[2], 2, 13);
         //
-
+        //max range
+        Object[] maxRange = maxRangeInit();
+        params.add((Label) maxRange[0], 0,14);
+        params.add((TextField) maxRange[1], 1, 14);
+        params.add((ChoiceBox<Length.ELength>) maxRange[2], 2, 14);
+        //
+        //range step
+        Object[] rangeStep = rangeStepInit();
+        params.add((Label) rangeStep[0], 0,15);
+        params.add((TextField) rangeStep[1], 1, 15);
+        params.add((ChoiceBox<Length.ELength>) rangeStep[2], 2, 15);
+        //
+        //
         //
 
         //calculate
@@ -152,9 +191,46 @@ public class RegularCalculationForm {
 
         root.getChildren().add(calculate);
 
+        ObservableBooleanValue[] baseFields = {
+                (ObservableBooleanValue) diameter[3],
+                (ObservableBooleanValue) mass[3],
+                (ObservableBooleanValue) velocity[3],
+                (ObservableBooleanValue) balCoef[3],
+                (ObservableBooleanValue) zeroRange[3],
+                (ObservableBooleanValue) sightHeight[3],
+                (ObservableBooleanValue) twistRate[3],
+                (ObservableBooleanValue) temperature[3],
+                (ObservableBooleanValue) humidity[3],
+                (ObservableBooleanValue) windSpeed[3],
+                (ObservableBooleanValue) windAzimuth[3],
+                (ObservableBooleanValue) shotAngle[3],
+                (ObservableBooleanValue) maxRange[3],
+                (ObservableBooleanValue) rangeStep[3]
+        };
+
+        ObservableBooleanValue altitudeField = (ObservableBooleanValue) altitude[3];
+        ObservableBooleanValue pressureField = (ObservableBooleanValue) pressure[3];
+
+        List<Observable> dependencies = new ArrayList<>(Arrays.asList(baseFields));
+        dependencies.addAll(Arrays.asList(altitudeField, pressureField, altitudeOpt.selectedProperty(), pressureOpt.selectedProperty()));
+
+        BooleanBinding disableCalculate = Bindings.createBooleanBinding(() -> {
+            for (ObservableBooleanValue field : baseFields) {
+                if (field.get()) {
+                    return true;
+                }
+            }
+            if (altitudeOpt.isSelected()) {
+                return altitudeField.get();
+            } else if (pressureOpt.isSelected()) {
+                return pressureField.get();
+            }
+            return true;
+        }, dependencies.toArray(new Observable[0]));
+
         calculate.setOnAction(
                 (_) -> {
-
+                    System.out.println(disableCalculate.get());
                 }
         );
         //
@@ -383,6 +459,80 @@ public class RegularCalculationForm {
         result[2] = velocityChoice;
         result[3] = isVelocityInvalid;
         result[4] = velocityValue;
+
+        return result;
+    }
+
+    private Object[] balCoefInit() {
+        Label balCoefLabel = new Label(UserSettings.getStr("balCoef.label"));
+
+        TextField balCoefText = new TextField();
+        balCoefText.setPrefSize(180, 40);
+
+        ChoiceBox<BallisticCoefficient.EBallisticCoefficient> balCoefChoice = new ChoiceBox<>();
+        balCoefChoice.setPrefSize(100, 40);
+        balCoefChoice.getItems().addAll((BallisticCoefficient.EBallisticCoefficient[]) Constants.ALLOWED_UNITS.get("balCoef"));
+        balCoefChoice.setValue((BallisticCoefficient.EBallisticCoefficient) UserSettings.defaultUnits.get("balCoef"));
+        balCoefChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(BallisticCoefficient.EBallisticCoefficient eBallisticCoefficient) {
+                return eBallisticCoefficient.getName();
+            }
+
+            @Override
+            public BallisticCoefficient.EBallisticCoefficient fromString(String s) {
+                for (BallisticCoefficient.EBallisticCoefficient e: (BallisticCoefficient.EBallisticCoefficient[]) Constants.ALLOWED_UNITS.get("balCoef")) {
+                    if (e.getName().equalsIgnoreCase("s")) return e;
+                }
+                return (BallisticCoefficient.EBallisticCoefficient) UserSettings.defaultUnits.get("balCoef");
+            }
+        });
+
+        double min = 0.001;
+        double max = 1;
+        balCoefText.setPromptText(min + " - " + max);
+
+        ObjectProperty<Double> balCoefValue = new SimpleObjectProperty<>(null);
+
+        balCoefChoice.valueProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != oldValue) {
+                        balCoefText.setPromptText(min + " - " + max);
+                    }
+                }
+        );
+
+        balCoefText.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.isEmpty() || newText.matches("\\d+[.,]?\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        balCoefText.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.replace(',','.');
+            try {
+                balCoefValue.set(Double.parseDouble(newValue));
+            } catch (NumberFormatException _) {
+                balCoefValue.set(null);
+            }
+        });
+
+        BooleanBinding isBalCoefInvalid = Bindings.createBooleanBinding(() -> {
+            Double val = balCoefValue.get();
+            if (val == null) return true;
+            return val < min || val > max;
+        }, balCoefChoice.valueProperty(), balCoefValue, balCoefText.getProperties());
+
+        balCoefText.styleProperty().bind(Bindings.when(isBalCoefInvalid).then("-fx-border-color: red;").otherwise(""));
+
+        Object[] result = new Object[5];
+        result[0] = balCoefLabel;
+        result[1] = balCoefText;
+        result[2] = balCoefChoice;
+        result[3] = isBalCoefInvalid;
+        result[4] = balCoefValue;
 
         return result;
     }
@@ -847,7 +997,7 @@ public class RegularCalculationForm {
 
         windAzimuthText.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
-            if (newText.isEmpty() || newText.matches("\\d+[.,]?\\d*")) {
+            if (newText.isEmpty() || newText.matches("-?\\d*[.,]?\\d*")) {
                 return change;
             }
             return null;
@@ -880,6 +1030,380 @@ public class RegularCalculationForm {
         result[3] = isWindAzimuthInvalid;
         result[4] = windAzimuthValue;
         result[5] = azimuth;
+
+        return result;
+    }
+
+    private Object[] altitudeInit() {
+        Label altitudeLabel = new Label(UserSettings.getStr("altitude.label"));
+
+        TextField altitudeText = new TextField();
+        altitudeText.setPrefSize(180, 40);
+
+        ChoiceBox<Length.ELength> altitudeChoice = new ChoiceBox<>();
+        altitudeChoice.setPrefSize(100, 40);
+        altitudeChoice.getItems().addAll((Length.ELength[]) Constants.ALLOWED_UNITS.get("altitude"));
+        altitudeChoice.setValue((Length.ELength) UserSettings.defaultUnits.get("altitude"));
+        altitudeChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Length.ELength eLength) {
+                return eLength.getName();
+            }
+
+            @Override
+            public Length.ELength fromString(String s) {
+                for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("altitude")) {
+                    if (e.getName().equalsIgnoreCase("s")) return e;
+                }
+                return (Length.ELength) UserSettings.defaultUnits.get("altitude");
+            }
+        });
+
+        Length min = new Length(0, Length.ELength.M);
+        Length max = new Length(8000, Length.ELength.M);
+        altitudeText.setPromptText(Math.ceil(min.get(altitudeChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(altitudeChoice.getValue(), 3)*100)/100.0);
+
+        ObjectProperty<Double> altitudeValue = new SimpleObjectProperty<>(null);
+
+        altitudeChoice.valueProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != oldValue) {
+                        altitudeText.setPromptText(Math.ceil(min.get(altitudeChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(altitudeChoice.getValue(), 3)*100)/100.0);
+                    }
+                }
+        );
+
+        altitudeText.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.isEmpty() || newText.matches("\\d+[.,]?\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        altitudeText.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.replace(',','.');
+            try {
+                altitudeValue.set(Double.parseDouble(newValue));
+            } catch (NumberFormatException _) {
+                altitudeValue.set(null);
+            }
+        });
+
+        BooleanBinding isAltitudeInvalid = Bindings.createBooleanBinding(() -> {
+            Double val = altitudeValue.get();
+            if (val == null) return true;
+            return val < min.get(altitudeChoice.getValue()) || val > max.get(altitudeChoice.getValue());
+        }, altitudeChoice.valueProperty(), altitudeValue, altitudeText.getProperties());
+
+        altitudeText.styleProperty().bind(Bindings.when(isAltitudeInvalid).then("-fx-border-color: red;").otherwise(""));
+
+        Object[] result = new Object[5];
+        result[0] = altitudeLabel;
+        result[1] = altitudeText;
+        result[2] = altitudeChoice;
+        result[3] = isAltitudeInvalid;
+        result[4] = altitudeValue;
+
+        return result;
+    }
+
+    private Object[] pressureInit() {
+        Label pressureLabel = new Label(UserSettings.getStr("pressure.label"));
+
+        TextField pressureText = new TextField();
+        pressureText.setPrefSize(180, 40);
+
+        ChoiceBox<Pressure.EPressure> pressureChoice = new ChoiceBox<>();
+        pressureChoice.setPrefSize(100, 40);
+        pressureChoice.getItems().addAll((Pressure.EPressure[]) Constants.ALLOWED_UNITS.get("pressure"));
+        pressureChoice.setValue((Pressure.EPressure) UserSettings.defaultUnits.get("pressure"));
+        pressureChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Pressure.EPressure ePressure) {
+                return ePressure.getName();
+            }
+
+            @Override
+            public Pressure.EPressure fromString(String s) {
+                for (Pressure.EPressure e: (Pressure.EPressure[]) Constants.ALLOWED_UNITS.get("pressure")) {
+                    if (e.getName().equalsIgnoreCase("s")) return e;
+                }
+                return (Pressure.EPressure) UserSettings.defaultUnits.get("pressure");
+            }
+        });
+
+        Pressure min = new Pressure(300, Pressure.EPressure.HPA);
+        Pressure max = new Pressure(1300, Pressure.EPressure.HPA);
+        pressureText.setPromptText(Math.ceil(min.get(pressureChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(pressureChoice.getValue(), 3)*100)/100.0);
+
+        ObjectProperty<Double> pressureValue = new SimpleObjectProperty<>(null);
+
+        pressureChoice.valueProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != oldValue) {
+                        pressureText.setPromptText(Math.ceil(min.get(pressureChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(pressureChoice.getValue(), 3)*100)/100.0);
+                    }
+                }
+        );
+
+        pressureText.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.isEmpty() || newText.matches("\\d+[.,]?\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        pressureText.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.replace(',','.');
+            try {
+                pressureValue.set(Double.parseDouble(newValue));
+            } catch (NumberFormatException _) {
+                pressureValue.set(null);
+            }
+        });
+
+        BooleanBinding isPressureInvalid = Bindings.createBooleanBinding(() -> {
+            Double val = pressureValue.get();
+            if (val == null) return true;
+            return val < min.get(pressureChoice.getValue()) || val > max.get(pressureChoice.getValue());
+        }, pressureChoice.valueProperty(), pressureValue, pressureText.getProperties());
+
+        pressureText.styleProperty().bind(Bindings.when(isPressureInvalid).then("-fx-border-color: red;").otherwise(""));
+
+        Object[] result = new Object[5];
+        result[0] = pressureLabel;
+        result[1] = pressureText;
+        result[2] = pressureChoice;
+        result[3] = isPressureInvalid;
+        result[4] = pressureValue;
+
+        return result;
+    }
+
+    private Object[] shotAngleInit() {
+        Label shotAngleLabel = new Label(UserSettings.getStr("shotAngle.label"));
+
+        TextField shotAngleText = new TextField();
+        shotAngleText.setPrefSize(180, 40);
+
+        ChoiceBox<Angle.EAngle> shotAngleChoice = new ChoiceBox<>();
+        shotAngleChoice.setPrefSize(100, 40);
+        shotAngleChoice.getItems().addAll((Angle.EAngle[]) Constants.ALLOWED_UNITS.get("shotAngle"));
+        shotAngleChoice.setValue((Angle.EAngle) UserSettings.defaultUnits.get("shotAngle"));
+        shotAngleChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Angle.EAngle eAngle) {
+                return eAngle.getName();
+            }
+
+            @Override
+            public Angle.EAngle fromString(String s) {
+                for (Angle.EAngle e: (Angle.EAngle[]) Constants.ALLOWED_UNITS.get("shotAngle")) {
+                    if (e.getName().equalsIgnoreCase("s")) return e;
+                }
+                return (Angle.EAngle) UserSettings.defaultUnits.get("shotAngle");
+            }
+        });
+
+        Angle min = new Angle(-80, Angle.EAngle.DEG);
+        Angle max = new Angle(80, Angle.EAngle.DEG);
+        shotAngleText.setPromptText(Math.ceil(min.get(shotAngleChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(shotAngleChoice.getValue(), 3)*100)/100.0);
+
+        ObjectProperty<Double> shotAngleValue = new SimpleObjectProperty<>(null);
+
+        shotAngleChoice.valueProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != oldValue) {
+                        shotAngleText.setPromptText(Math.ceil(min.get(shotAngleChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(shotAngleChoice.getValue(), 3)*100)/100.0);
+                    }
+                }
+        );
+
+        shotAngleText.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.isEmpty() || newText.matches("-?\\d*[.,]?\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        shotAngleText.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.replace(',','.');
+            try {
+                shotAngleValue.set(Double.parseDouble(newValue));
+            } catch (NumberFormatException _) {
+                shotAngleValue.set(null);
+            }
+        });
+
+        BooleanBinding isShotAngleInvalid = Bindings.createBooleanBinding(() -> {
+            Double val = shotAngleValue.get();
+            if (val == null) return true;
+            return val < min.get(shotAngleChoice.getValue()) || val > max.get(shotAngleChoice.getValue());
+        }, shotAngleChoice.valueProperty(), shotAngleValue, shotAngleText.getProperties());
+
+        shotAngleText.styleProperty().bind(Bindings.when(isShotAngleInvalid).then("-fx-border-color: red;").otherwise(""));
+
+        Label azimuth = new Label(UserSettings.getStr("shotAngle.desc"));
+        azimuth.setStyle("-fx-font-size: 10px");
+
+        Object[] result = new Object[6];
+        result[0] = shotAngleLabel;
+        result[1] = shotAngleText;
+        result[2] = shotAngleChoice;
+        result[3] = isShotAngleInvalid;
+        result[4] = shotAngleValue;
+        result[5] = azimuth;
+
+        return result;
+    }
+
+    private Object[] maxRangeInit() {
+        Label maxRangeLabel = new Label(UserSettings.getStr("maxRange.label"));
+
+        TextField maxRangeText = new TextField();
+        maxRangeText.setPrefSize(180, 40);
+
+        ChoiceBox<Length.ELength> maxRangeChoice = new ChoiceBox<>();
+        maxRangeChoice.setPrefSize(100, 40);
+        maxRangeChoice.getItems().addAll((Length.ELength[]) Constants.ALLOWED_UNITS.get("maxRange"));
+        maxRangeChoice.setValue((Length.ELength) UserSettings.defaultUnits.get("maxRange"));
+        maxRangeChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Length.ELength eLength) {
+                return eLength.getName();
+            }
+
+            @Override
+            public Length.ELength fromString(String s) {
+                for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("maxRange")) {
+                    if (e.getName().equalsIgnoreCase("s")) return e;
+                }
+                return (Length.ELength) UserSettings.defaultUnits.get("maxRange");
+            }
+        });
+
+        Length min = new Length(10, Length.ELength.M);
+        Length max = new Length(3000, Length.ELength.M);
+        maxRangeText.setPromptText(Math.ceil(min.get(maxRangeChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(maxRangeChoice.getValue(), 3)*100)/100.0);
+
+        ObjectProperty<Double> maxRangeValue = new SimpleObjectProperty<>(null);
+
+        maxRangeChoice.valueProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != oldValue) {
+                        maxRangeText.setPromptText(Math.ceil(min.get(maxRangeChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(maxRangeChoice.getValue(), 3)*100)/100.0);
+                    }
+                }
+        );
+
+        maxRangeText.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.isEmpty() || newText.matches("\\d+[.,]?\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        maxRangeText.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.replace(',','.');
+            try {
+                maxRangeValue.set(Double.parseDouble(newValue));
+            } catch (NumberFormatException _) {
+                maxRangeValue.set(null);
+            }
+        });
+
+        BooleanBinding isMaxRangeInvalid = Bindings.createBooleanBinding(() -> {
+            Double val = maxRangeValue.get();
+            if (val == null) return true;
+            return val < min.get(maxRangeChoice.getValue()) || val > max.get(maxRangeChoice.getValue());
+        }, maxRangeChoice.valueProperty(), maxRangeValue, maxRangeText.getProperties());
+
+        maxRangeText.styleProperty().bind(Bindings.when(isMaxRangeInvalid).then("-fx-border-color: red;").otherwise(""));
+
+        Object[] result = new Object[5];
+        result[0] = maxRangeLabel;
+        result[1] = maxRangeText;
+        result[2] = maxRangeChoice;
+        result[3] = isMaxRangeInvalid;
+        result[4] = maxRangeValue;
+
+        return result;
+    }
+
+    private Object[] rangeStepInit() {
+        Label rangeStepLabel = new Label(UserSettings.getStr("rangeStep.label"));
+
+        TextField rangeStepText = new TextField();
+        rangeStepText.setPrefSize(180, 40);
+
+        ChoiceBox<Length.ELength> rangeStepChoice = new ChoiceBox<>();
+        rangeStepChoice.setPrefSize(100, 40);
+        rangeStepChoice.getItems().addAll((Length.ELength[]) Constants.ALLOWED_UNITS.get("rangeStep"));
+        rangeStepChoice.setValue((Length.ELength) UserSettings.defaultUnits.get("rangeStep"));
+        rangeStepChoice.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Length.ELength eLength) {
+                return eLength.getName();
+            }
+
+            @Override
+            public Length.ELength fromString(String s) {
+                for (Length.ELength e: (Length.ELength[]) Constants.ALLOWED_UNITS.get("rangeStep")) {
+                    if (e.getName().equalsIgnoreCase("s")) return e;
+                }
+                return (Length.ELength) UserSettings.defaultUnits.get("rangeStep");
+            }
+        });
+
+        Length min = new Length(5, Length.ELength.M);
+        Length max = new Length(500, Length.ELength.M);
+        rangeStepText.setPromptText(Math.ceil(min.get(rangeStepChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(rangeStepChoice.getValue(), 3)*100)/100.0);
+
+        ObjectProperty<Double> rangeStepValue = new SimpleObjectProperty<>(null);
+
+        rangeStepChoice.valueProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != oldValue) {
+                        rangeStepText.setPromptText(Math.ceil(min.get(rangeStepChoice.getValue(), 3)*100)/100.0 + " - " + Math.floor(max.get(rangeStepChoice.getValue(), 3)*100)/100.0);
+                    }
+                }
+        );
+
+        rangeStepText.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.isEmpty() || newText.matches("\\d+[.,]?\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+
+        rangeStepText.textProperty().addListener((observable, oldValue, newValue) -> {
+            newValue = newValue.replace(',','.');
+            try {
+                rangeStepValue.set(Double.parseDouble(newValue));
+            } catch (NumberFormatException _) {
+                rangeStepValue.set(null);
+            }
+        });
+
+        BooleanBinding isRangeStepInvalid = Bindings.createBooleanBinding(() -> {
+            Double val = rangeStepValue.get();
+            if (val == null) return true;
+            return val < min.get(rangeStepChoice.getValue()) || val > max.get(rangeStepChoice.getValue());
+        }, rangeStepChoice.valueProperty(), rangeStepValue, rangeStepText.getProperties());
+
+        rangeStepText.styleProperty().bind(Bindings.when(isRangeStepInvalid).then("-fx-border-color: red;").otherwise(""));
+
+        Object[] result = new Object[5];
+        result[0] = rangeStepLabel;
+        result[1] = rangeStepText;
+        result[2] = rangeStepChoice;
+        result[3] = isRangeStepInvalid;
+        result[4] = rangeStepValue;
 
         return result;
     }
