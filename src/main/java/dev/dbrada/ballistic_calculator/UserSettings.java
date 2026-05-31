@@ -122,6 +122,10 @@ public abstract class UserSettings {
         return result;
     }
 
+    public static void updateLang() {
+        bundle = ResourceBundle.getBundle("langs/lang", lang.locale);
+    }
+
     /**
      * Handles color presets
      */
@@ -142,7 +146,8 @@ public abstract class UserSettings {
     @AllArgsConstructor
     public enum Languages {
         EN_US("English - US", Locale.US),
-        EN_UK("English - UK", Locale.UK);
+        EN_UK("English - UK", Locale.UK),
+        CS_CZ("Čeština", Locale.of("cs", "CZ"));
 
         private final String name;
         private final Locale locale;

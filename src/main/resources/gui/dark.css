@@ -7,3 +7,19 @@
 .text-input {
     -fx-prompt-text-fill: #909090;
 }
+.error-notification {
+    -fx-background-color: #FF0000;
+    -fx-text-fill: white;
+    -fx-padding: 10px 20px 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+.success-notification {
+     -fx-background-color: #00FF00;
+     -fx-text-fill: white;
+     -fx-padding: 10px 20px 10px 20px;
+     -fx-background-radius: 5px;
+     -fx-font-weight: bold;
+     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
+ }

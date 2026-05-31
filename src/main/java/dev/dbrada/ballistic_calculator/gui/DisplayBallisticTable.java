@@ -4,17 +4,17 @@ import dev.dbrada.ballistic_calculator.BallisticCurve;
 import dev.dbrada.ballistic_calculator.Parameters;
 import dev.dbrada.ballistic_calculator.UserSettings;
 import dev.dbrada.ballistic_calculator.units.Angle;
+import javafx.animation.SequentialTransition;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Provides a gui display of a ballistic curve by table
@@ -46,6 +46,40 @@ public class DisplayBallisticTable {
                     menu.start(stage);
                 }
         );
+
+        Button save = new Button(UserSettings.getStr("save.button"));
+        save.layoutXProperty().bind(root.widthProperty().multiply(1).subtract(save.widthProperty()));
+        save.layoutYProperty().bind(root.heightProperty().multiply(0));
+
+        root.getChildren().add(save);
+
+        save.setOnAction(
+                (_) -> {
+                    TextInputDialog dialog = new TextInputDialog();
+                    dialog.setTitle(UserSettings.getStr("fileName.title"));
+                    dialog.setContentText(UserSettings.getStr("fileName.label"));
+
+                    Optional<String> result = dialog.showAndWait();
+
+                    Label status;
+                    Pane rootPane = (Pane) save.getScene().getRoot();
+                    if (result.isPresent() && Parameters.save(result.get(), param)) {
+                        status = new Label(UserSettings.getStr("saveSuccessful.label"));
+                        status.getStyleClass().add("success-notification");
+                    } else {
+                        status = new Label(UserSettings.getStr("saveUnsuccessful.label"));
+                        status.getStyleClass().add("error-notification");
+                    }
+
+                    status.layoutXProperty().bind(rootPane.widthProperty().subtract(status.widthProperty()).divide(2));
+                    status.layoutYProperty().bind(rootPane.heightProperty().subtract(status.heightProperty()).subtract(50));
+
+                    rootPane.getChildren().add(status);
+
+                    SequentialTransition sequence = SharedElements.getTransition(status, rootPane);
+                    sequence.play();
+                }
+        );
         //
         //grid
         GridPane grid = new GridPane();
@@ -54,7 +88,7 @@ public class DisplayBallisticTable {
         grid.setVgap(10);
         ScrollPane scrollParams = new ScrollPane(grid);
         scrollParams.layoutXProperty().bind(root.widthProperty().multiply(0.025));
-        scrollParams.layoutYProperty().bind(back.heightProperty().add(10));
+        scrollParams.layoutYProperty().bind(save.heightProperty().add(10));
         scrollParams.setPrefSize(previous.getWidth()*0.95, previous.getHeight()-50);
         root.getChildren().add(scrollParams);
         //

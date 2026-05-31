@@ -6,4 +6,6 @@ module ballistic.calculator {
     requires com.google.gson;
 
     exports dev.dbrada.ballistic_calculator.gui;
+    exports dev.dbrada.ballistic_calculator;
+    opens dev.dbrada.ballistic_calculator.units to com.google.gson;
 }

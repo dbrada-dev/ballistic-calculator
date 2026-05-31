@@ -85,7 +85,20 @@ public class Menu extends Application {
         );
         //
 
-        VBox options = new VBox(optionsLabel, spacer, normalCalculation, simpleCalculation);
+        //saves parameters
+        Button savedParams = new Button(UserSettings.getStr("savedParams.button"));
+        savedParams.setPrefSize(400, 40);
+
+        savedParams.setOnAction(
+                (_) -> {
+                    Scene current = settingsButton.getScene();
+                    SavedParameters formWindow = new SavedParameters(current);
+                    stage.setScene(formWindow.getScene());
+                }
+        );
+        //
+
+        VBox options = new VBox(optionsLabel, spacer, normalCalculation, simpleCalculation, savedParams);
         options.setAlignment(Pos.CENTER);
 
         options.layoutXProperty().bind(root.widthProperty().multiply(0.5).subtract(options.widthProperty().divide(2)));

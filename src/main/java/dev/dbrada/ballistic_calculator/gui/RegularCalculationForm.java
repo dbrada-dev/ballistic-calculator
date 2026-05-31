@@ -2,6 +2,7 @@ package dev.dbrada.ballistic_calculator.gui;
 
 import dev.dbrada.ballistic_calculator.*;
 import dev.dbrada.ballistic_calculator.units.*;
+import javafx.animation.SequentialTransition;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -57,6 +58,7 @@ public class RegularCalculationForm {
         //parameters
         //grid
         GridPane params = new GridPane();
+        params.setId("params");
         params.setAlignment(Pos.CENTER_LEFT);
         params.setHgap(10);
         params.setVgap(10);
@@ -73,25 +75,25 @@ public class RegularCalculationForm {
         //
         //projectile
         //diameter
-        Object[] diameter = FormElements.diameterInit();
+        Object[] diameter = SharedElements.diameterInit();
         params.add((Label) diameter[0], 0, 1);
         params.add((TextField) diameter[1], 1, 1);
         params.add((ChoiceBox<Length.ELength>) diameter[2], 2, 1);
         //
         //mass
-        Object[] mass = FormElements.massInit();
+        Object[] mass = SharedElements.massInit();
         params.add((Label) mass[0], 0, 2);
         params.add((TextField) mass[1], 1, 2);
         params.add((ChoiceBox<Mass.EMass>) mass[2], 2, 2);
         //
         //velocity
-        Object[] velocity = FormElements.velocityInit();
+        Object[] velocity = SharedElements.velocityInit();
         params.add((Label) velocity[0], 0, 3);
         params.add((TextField) velocity[1], 1, 3);
         params.add((ChoiceBox<Speed.ESpeed>) velocity[2], 2, 3);
         //
         //ballistic coefficient
-        Object[] balCoef = FormElements.balCoefInit();
+        Object[] balCoef = SharedElements.balCoefInit();
         params.add((Label) balCoef[0], 0, 4);
         params.add((TextField) balCoef[1], 1, 4);
         params.add((ChoiceBox<BallisticCoefficient.EBallisticCoefficient>) balCoef[2], 2, 4);
@@ -99,43 +101,43 @@ public class RegularCalculationForm {
         //
         //rifle setup
         //zero range
-        Object[] zeroRange = FormElements.zeroRangeInit();
+        Object[] zeroRange = SharedElements.zeroRangeInit();
         params.add((Label) zeroRange[0], 0, 5);
         params.add((TextField) zeroRange[1], 1, 5);
         params.add((ChoiceBox<Length.ELength>) zeroRange[2], 2, 5);
         //
         //sight height
-        Object[] sightHeight = FormElements.sightHeightInit();
+        Object[] sightHeight = SharedElements.sightHeightInit();
         params.add((Label) sightHeight[0], 0, 6);
         params.add((TextField) sightHeight[1], 1, 6);
         params.add((ChoiceBox<Length.ELength>) sightHeight[2], 2, 6);
         //
         //twist rate
-        Object[] twistRate = FormElements.twistRateInit();
+        Object[] twistRate = SharedElements.twistRateInit();
         params.add((Label) twistRate[0], 0, 7);
         params.add((TextField) twistRate[1], 1, 7);
         params.add((ChoiceBox<Length.ELength>) twistRate[2], 2, 7);
         //
         //temperature
-        Object[] temperature = FormElements.temperatureInit();
+        Object[] temperature = SharedElements.temperatureInit();
         params.add((Label) temperature[0], 0, 8);
         params.add((TextField) temperature[1], 1, 8);
         params.add((ChoiceBox<Length.ELength>) temperature[2], 2, 8);
         //
         //humidity
-        Object[] humidity = FormElements.humidityInit();
+        Object[] humidity = SharedElements.humidityInit();
         params.add((Label) humidity[0], 0, 9);
         params.add((TextField) humidity[1], 1, 9);
         params.add((Label) humidity[2], 2, 9);
         //
         //wind speed
-        Object[] windSpeed = FormElements.windSpeedInit();
+        Object[] windSpeed = SharedElements.windSpeedInit();
         params.add((Label) windSpeed[0], 0, 10);
         params.add((TextField) windSpeed[1], 1, 10);
         params.add((ChoiceBox<Speed.ESpeed>) windSpeed[2], 2, 10);
         //
         //wind azimuth
-        Object[] windAzimuth = FormElements.windAzimuthInit();
+        Object[] windAzimuth = SharedElements.windAzimuthInit();
         params.add((Label) windAzimuth[0], 0, 11);
         params.add(new VBox((TextField) windAzimuth[1], (Label) windAzimuth[5]), 1, 11);
         params.add((ChoiceBox<Angle.EAngle>) windAzimuth[2], 2, 11);
@@ -149,8 +151,8 @@ public class RegularCalculationForm {
         params.add(altitudeOpt, 0, 12);
         params.add(pressureOpt, 1, 12);
 
-        Object[] altitude = FormElements.altitudeInit();
-        Object[] pressure = FormElements.pressureInit();
+        Object[] altitude = SharedElements.altitudeInit();
+        Object[] pressure = SharedElements.pressureInit();
 
         altitudeOpt.selectedProperty().addListener((_, _, isSelected) -> {
             if (isSelected) {
@@ -175,19 +177,19 @@ public class RegularCalculationForm {
         altitudeOpt.setSelected(true);
         //
         //shot angle
-        Object[] shotAngle = FormElements.shotAngleInit();
+        Object[] shotAngle = SharedElements.shotAngleInit();
         params.add((Label) shotAngle[0], 0, 14);
         params.add(new VBox((TextField) shotAngle[1], (Label) shotAngle[5]), 1, 14);
         params.add((ChoiceBox<Angle.EAngle>) shotAngle[2], 2, 14);
         //
         //max range
-        Object[] maxRange = FormElements.maxRangeInit();
+        Object[] maxRange = SharedElements.maxRangeInit();
         params.add((Label) maxRange[0], 0, 15);
         params.add((TextField) maxRange[1], 1, 15);
         params.add((ChoiceBox<Length.ELength>) maxRange[2], 2, 15);
         //
         //range step
-        Object[] rangeStep = FormElements.rangeStepInit();
+        Object[] rangeStep = SharedElements.rangeStepInit();
         params.add((Label) rangeStep[0], 0, 16);
         params.add((TextField) rangeStep[1], 1, 16);
         params.add((ChoiceBox<Length.ELength>) rangeStep[2], 2, 16);
@@ -314,9 +316,6 @@ public class RegularCalculationForm {
 
         calculate.setOnAction(
                 (_) -> {
-                    Parameters parameters = null;
-                    BallisticCurve bc = null;
-
                     try {
                         Pressure pressureOut;
                         if (altitudeOpt.isSelected()) {
@@ -342,7 +341,7 @@ public class RegularCalculationForm {
                             devA[i] = devAList.get(i);
                         }
 
-                        parameters = new Parameters(
+                        Parameters parameters = new Parameters(
                                 new Length(((ObjectProperty<Double>) diameter[4]).getValue(), ((ChoiceBox<Length.ELength>) diameter[2]).getValue()),
                                 new Mass(((ObjectProperty<Double>) mass[4]).getValue(), ((ChoiceBox<Mass.EMass>) mass[2]).getValue()),
                                 new Speed(((ObjectProperty<Double>) velocity[4]).getValue(), ((ChoiceBox<Speed.ESpeed>) velocity[2]).getValue()),
@@ -363,14 +362,26 @@ public class RegularCalculationForm {
                                 devA, othersTime.isSelected(), othersVelocity.isSelected()
                         );
 
-                        bc = new BallisticCurve(Physics.positionIntegration(new Physics(parameters)));
-                    } catch (Exception e) {
-                        back.fire();
-                    }
+                        BallisticCurve bc = new BallisticCurve(Physics.positionIntegration(new Physics(parameters)));
 
-                    Stage current = (Stage) calculate.getScene().getWindow();
-                    DisplayBallisticTable display = new DisplayBallisticTable(previous, bc, parameters);
-                    current.setScene(display.getScene());
+                        Stage current = (Stage) calculate.getScene().getWindow();
+                        DisplayBallisticTable display = new DisplayBallisticTable(previous, bc, parameters);
+                        current.setScene(display.getScene());
+                    } catch (Exception e) {
+                        ((Stage) calculate.getScene().getWindow()).setScene(previous);
+
+                        Pane rootPane = (Pane) previous.getRoot();
+                        Label notification = new Label(UserSettings.getStr("calculationFail.label"));
+                        notification.getStyleClass().add("error-notification");
+
+                        notification.layoutXProperty().bind(rootPane.widthProperty().subtract(notification.widthProperty()).divide(2));
+                        notification.layoutYProperty().bind(rootPane.heightProperty().subtract(notification.heightProperty()).subtract(50));
+
+                        rootPane.getChildren().add(notification);
+
+                        SequentialTransition sequence = SharedElements.getTransition(notification, rootPane);
+                        sequence.play();
+                    }
                 }
         );
         //

@@ -108,6 +108,7 @@ public class Settings {
                 (_) -> {
                     UserSettings.colorPreset = colorPreset.getValue();
                     UserSettings.lang = lang.getValue();
+                    UserSettings.updateLang();
 
                     for (int i = 0; i < defaultUnitNames.size(); i++) {
                         UserSettings.defaultUnits.put(defaultUnitNames.get(i), defaultUnitChoices.get(i).getValue());
