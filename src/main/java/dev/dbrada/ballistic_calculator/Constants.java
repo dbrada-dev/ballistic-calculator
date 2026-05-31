@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonReader;
 import dev.dbrada.ballistic_calculator.units.*;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,7 +108,7 @@ public abstract class Constants {
             if (input == null || input.length == 0) throw new JsonSyntaxException("Json error");
 
             for (String[] strings : input) {
-                Enum<?>[] arr = new Enum<?>[strings.length - 2];
+                Enum<?>[] arr = (Enum<?>[]) Array.newInstance(units.get(strings[1]), strings.length - 2);
                 Enum<?>[] available = (Enum<?>[]) units.get(strings[1]).getMethod("values").invoke(null);
                 for (int j = 2; j < strings.length; j++) {
                     for (NamedUnit a : (NamedUnit[]) available) {

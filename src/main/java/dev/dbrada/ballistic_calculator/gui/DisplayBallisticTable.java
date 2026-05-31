@@ -63,8 +63,6 @@ public class DisplayBallisticTable {
         if (param.outputVelocity()) len++;
         len += param.outputDeviationA().length*2;
 
-        System.out.println(param.outputDeviationL());
-
         String[] header = getHeader(len);
         for (int i = 0; i < len; i++) {
             grid.add(new Label(header[i]), i, 0);
