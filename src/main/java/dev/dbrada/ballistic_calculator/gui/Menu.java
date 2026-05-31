@@ -72,7 +72,20 @@ public class Menu extends Application {
         );
         //
 
-        VBox options = new VBox(optionsLabel, spacer, normalCalculation);
+        //simple calculation form
+        Button simpleCalculation = new Button(UserSettings.getStr("simpleCalculation.button"));
+        simpleCalculation.setPrefSize(400, 40);
+
+        simpleCalculation.setOnAction(
+                (_) -> {
+                    Scene current = settingsButton.getScene();
+                    SimpleCalculationForm formWindow = new SimpleCalculationForm(current);
+                    stage.setScene(formWindow.getScene());
+                }
+        );
+        //
+
+        VBox options = new VBox(optionsLabel, spacer, normalCalculation, simpleCalculation);
         options.setAlignment(Pos.CENTER);
 
         options.layoutXProperty().bind(root.widthProperty().multiply(0.5).subtract(options.widthProperty().divide(2)));
