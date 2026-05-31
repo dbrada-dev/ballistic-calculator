@@ -18,7 +18,7 @@ public class BallisticCoefficient {
      */
     @Getter
     @AllArgsConstructor
-    public enum EBallisticCoefficient {
+    public enum EBallisticCoefficient implements NamedUnit {
         G1 ("/dragCoefficients/g1_dragCoefStd.csv", "G1"),
         G7 ("/dragCoefficients/g7_dragCoefStd.csv", "G7");
 

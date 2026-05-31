@@ -90,7 +90,7 @@ public class Mass {
      */
     @Getter
     @AllArgsConstructor
-    public enum EMass {
+    public enum EMass implements NamedUnit {
         G("g"),
         KG("kg"),
         GR("gr"),

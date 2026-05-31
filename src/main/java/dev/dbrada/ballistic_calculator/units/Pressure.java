@@ -74,7 +74,7 @@ public class Pressure {
      */
     @Getter
     @AllArgsConstructor
-    public enum EPressure {
+    public enum EPressure implements NamedUnit {
         PA("Pa"),
         HPA("hPa"),
         KPA("kPa");

@@ -90,7 +90,7 @@ public class Speed {
      */
     @Getter
     @AllArgsConstructor
-    public enum ESpeed {
+    public enum ESpeed implements NamedUnit {
         MPS("m/s"),
         FPS("fps"),
         KMPH("km/h"),

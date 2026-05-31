@@ -1,17 +1,22 @@
 package dev.dbrada.ballistic_calculator.gui;
 
+import dev.dbrada.ballistic_calculator.Constants;
 import dev.dbrada.ballistic_calculator.UserSettings;
+import dev.dbrada.ballistic_calculator.units.NamedUnit;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -51,34 +56,45 @@ public class Settings {
                 }
         );
         //
-
-        //settings
-        VBox settings = new VBox();
-
-        settings.layoutXProperty().bind(root.widthProperty().multiply(0.025));
-        settings.layoutYProperty().bind(back.heightProperty().add(10));
+        //grid
+        GridPane settings = new GridPane();
         settings.setAlignment(Pos.CENTER_LEFT);
-        root.getChildren().add(settings);
+        settings.setHgap(10);
+        settings.setVgap(10);
+        ScrollPane scrollParams = new ScrollPane(settings);
+        scrollParams.layoutXProperty().bind(root.widthProperty().multiply(0.025));
+        scrollParams.layoutYProperty().bind(back.heightProperty().add(10));
+        scrollParams.setPrefSize(previous.getWidth()*0.95, previous.getHeight()-50);
+        root.getChildren().add(scrollParams);
         //
 
+        //settings
+        //general
         //language
         langInit();
         Label langLabel = new Label(UserSettings.getStr("language.label"));
-        HBox langBox = new HBox(langLabel, lang);
-        langBox.setAlignment(Pos.CENTER_LEFT);
-        Pane spacer0 = new Pane();
-        spacer0.setPrefSize(0,5);
-        settings.getChildren().addAll(spacer0, langBox);
+        settings.add(langLabel, 0, 1);
+        settings.add(lang, 1, 1);
         //
-
         //color preset
         colorPresetInit();
         Label colorPresetLabel = new Label(UserSettings.getStr("scheme.label"));
-        HBox colorPresetBox = new HBox(colorPresetLabel, colorPreset);
-        colorPresetBox.setAlignment(Pos.CENTER_LEFT);
-        Pane spacer1 = new Pane();
-        spacer1.setPrefSize(0,5);
-        settings.getChildren().addAll(spacer1, colorPresetBox);
+        settings.add(colorPresetLabel, 0, 2);
+        settings.add(colorPreset, 1, 2);
+        //
+        //
+        //default units
+        List<ChoiceBox<Enum<?>>> defaultUnitChoices = new ArrayList<>();
+        List<Label> defaultUnitLabels = new ArrayList<>();
+        List<String> defaultUnitNames = new ArrayList<>();
+
+        defaultUnitInit(defaultUnitNames, defaultUnitLabels, defaultUnitChoices);
+
+        for (int i = 0; i < defaultUnitLabels.size(); i++) {
+            settings.add(defaultUnitLabels.get(i), 0, i+4);
+            settings.add(defaultUnitChoices.get(i), 1, i+4);
+        }
+        //
         //
 
         //save
@@ -92,6 +108,11 @@ public class Settings {
                 (_) -> {
                     UserSettings.colorPreset = colorPreset.getValue();
                     UserSettings.lang = lang.getValue();
+
+                    for (int i = 0; i < defaultUnitNames.size(); i++) {
+                        UserSettings.defaultUnits.put(defaultUnitNames.get(i), defaultUnitChoices.get(i).getValue());
+                    }
+
                     UserSettings.save();
                     Stage stage = (Stage) save.getScene().getWindow();
                     stage.setScene(new Settings(save.getScene()).getScene());
@@ -151,5 +172,43 @@ public class Settings {
                 return UserSettings.Colors.DARK;
             }
         });
+    }
+
+    /**
+     * Prepares default unit choice
+     * @param defaultUnitNames Stores keys for saving
+     * @param defaultUnitLabels Stores {@code Label}s for gui
+     * @param defaultUnitChoices Stores the setup {@code ChoiceBox}es
+     */
+    private void defaultUnitInit(List<String> defaultUnitNames, List<Label> defaultUnitLabels, List<ChoiceBox<Enum<?>>> defaultUnitChoices) {
+        for (Map.Entry<String, Enum<?>> e : UserSettings.defaultUnits.entrySet()) {
+            defaultUnitNames.add(e.getKey());
+            defaultUnitLabels.add(new Label(UserSettings.getStr(e.getKey() + ".label")));
+            ChoiceBox<Enum<?>> ch = new ChoiceBox<>();
+            ch.getItems().addAll(Constants.ALLOWED_UNITS.get(e.getKey()));
+            ch.setValue(e.getValue());
+            ch.setPrefSize(100, 30);
+            ch.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(Enum<?> object) {
+                    return ((NamedUnit) object).getName();
+                }
+
+                @Override
+                public Enum<?> fromString(String string) {
+                    if (string == null || string.isBlank()) {
+                        return UserSettings.defaultUnits.get(e.getKey());
+                    }
+                    for (Enum<?> item : ch.getItems()) {
+                        NamedUnit nu = (NamedUnit) item;
+                        if (nu.getName().equalsIgnoreCase(string)) {
+                            return item;
+                        }
+                    }
+                    return UserSettings.defaultUnits.get(e.getKey());
+                }
+            });
+            defaultUnitChoices.add(ch);
+        }
     }
 }

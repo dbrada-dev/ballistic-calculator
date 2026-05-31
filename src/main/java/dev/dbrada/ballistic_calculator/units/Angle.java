@@ -90,7 +90,7 @@ public class Angle {
      */
     @Getter
     @AllArgsConstructor
-    public enum EAngle {
+    public enum EAngle implements NamedUnit {
         DEG("deg"),
         RAD("rad"),
         MOA("MOA"),

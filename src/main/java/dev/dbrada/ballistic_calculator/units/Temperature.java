@@ -74,7 +74,7 @@ public class Temperature {
      */
     @Getter
     @AllArgsConstructor
-    public enum ETemperature {
+    public enum ETemperature implements NamedUnit {
         C("°C"),
         K("K"),
         F("°F");

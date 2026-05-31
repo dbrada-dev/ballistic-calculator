@@ -128,7 +128,7 @@ public class Length {
      */
     @Getter
     @AllArgsConstructor
-    public enum ELength {
+    public enum ELength implements NamedUnit {
         MM("mm"),
         CM("cm"),
         M("m"),
