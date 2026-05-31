@@ -1,0 +1,20 @@
+[
+  ["diameter", "Length", "MM", "IN"],
+  ["mass", "Mass", "GR", "G"],
+  ["velocity", "Speed", "MPS", "FPS"],
+  ["balCoef", "BallisticCoefficient", "G1", "G7"],
+  ["zeroRange", "Length", "M", "YD", "FT"],
+  ["sightHeight", "Length", "CM", "MM", "IN"],
+  ["twistRate", "Length", "IN", "CM", "MM"],
+  ["temperature", "Temperature", "C", "F"],
+  ["windSpeed", "Speed", "KMPH", "MPH", "MPS"],
+  ["windAzimuth", "Angle", "DEG"],
+  ["altitude", "Length", "M", "FT", "YD"],
+  ["pressure", "Pressure", "HPA", "KPA"],
+  ["shotAngle", "Angle", "DEG"],
+  ["maxRange", "Length", "M", "YD", "FT"],
+  ["rangeStep", "Length", "M", "YD", "FT"],
+  ["range", "Length", "M", "YD", "FT"],
+  ["deviationL", "Length", "CM", "IN"],
+  ["deviationA", "Angle", "MRAD", "MOA"]
+]

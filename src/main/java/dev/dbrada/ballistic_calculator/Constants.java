@@ -1,7 +1,13 @@
 package dev.dbrada.ballistic_calculator;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import dev.dbrada.ballistic_calculator.units.*;
 
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,31 +83,48 @@ public abstract class Constants {
      * Specified units allowed for different tasks
      */
     public static final Map<String, Enum<?>[]> ALLOWED_UNITS = allowedInit();
+
     /**
-     * Initializes {@code ALLOWED_UNITS}, faster and more efficient than file loading, shall not be changed unless other code edit
+     * Initializes {@code ALLOWED_UNITS}
      * @return map of {@code String} and unit enums
      */
     private static Map<String, Enum<?>[]> allowedInit() {
-        HashMap<String, Enum<?>[]> result = new HashMap<>();
-        result.put("diameter", new Length.ELength[]{Length.ELength.MM, Length.ELength.IN});
-        result.put("mass", new Mass.EMass[]{Mass.EMass.GR, Mass.EMass.G});
-        result.put("velocity", new Speed.ESpeed[]{Speed.ESpeed.MPS, Speed.ESpeed.FPS});
-        result.put("balCoef", new BallisticCoefficient.EBallisticCoefficient[]{BallisticCoefficient.EBallisticCoefficient.G1, BallisticCoefficient.EBallisticCoefficient.G7});
-        result.put("zeroRange", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
-        result.put("sightHeight", new Length.ELength[]{Length.ELength.CM, Length.ELength.MM, Length.ELength.IN});
-        result.put("twistRate", new Length.ELength[]{Length.ELength.IN, Length.ELength.CM, Length.ELength.MM});
-        result.put("temperature", new Temperature.ETemperature[]{Temperature.ETemperature.C, Temperature.ETemperature.F});
-        result.put("windSpeed", new Speed.ESpeed[]{Speed.ESpeed.KMPH, Speed.ESpeed.MPH, Speed.ESpeed.MPS});
-        result.put("windAzimuth", new Angle.EAngle[]{Angle.EAngle.DEG});
-        result.put("altitude", new Length.ELength[]{Length.ELength.M, Length.ELength.FT, Length.ELength.YD});
-        result.put("pressure", new Pressure.EPressure[]{Pressure.EPressure.HPA, Pressure.EPressure.KPA});
-        result.put("shotAngle", new Angle.EAngle[]{Angle.EAngle.DEG});
-        result.put("maxRange", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
-        result.put("rangeStep", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
+        Map<String, Enum<?>[]> result = new HashMap<>();
+        String[][] input;
 
-        result.put("range", new Length.ELength[]{Length.ELength.M, Length.ELength.YD, Length.ELength.FT});
-        result.put("deviationL", new Length.ELength[]{Length.ELength.CM, Length.ELength.IN});
-        result.put("deviationA", new Angle.EAngle[]{Angle.EAngle.MRAD, Angle.EAngle.MOA});
+        Map<String, Class<?>> units = new HashMap<>();
+        units.put("Angle", Angle.EAngle.class);
+        units.put("BallisticCoefficient", BallisticCoefficient.EBallisticCoefficient.class);
+        units.put("Length", Length.ELength.class);
+        units.put("Mass", Mass.EMass.class);
+        units.put("Pressure", Pressure.EPressure.class);
+        units.put("Speed", Speed.ESpeed.class);
+        units.put("Temperature", Temperature.ETemperature.class);
+
+        try(FileInputStream in = new FileInputStream("src/main/resources/allowedUnits.json")) {
+            Gson gson = new Gson();
+            input = gson.fromJson(new JsonReader(new InputStreamReader(in)), TypeToken.get(String[][].class));
+            if (input == null || input.length == 0) throw new JsonSyntaxException("Json error");
+
+            for (String[] strings : input) {
+                Enum<?>[] arr = new Enum<?>[strings.length - 2];
+                Enum<?>[] available = (Enum<?>[]) units.get(strings[1]).getMethod("values").invoke(null);
+                for (int j = 2; j < strings.length; j++) {
+                    for (NamedUnit a : (NamedUnit[]) available) {
+                        if (a.toString().equalsIgnoreCase(strings[j])) {
+                            arr[j - 2] = (Enum<?>) a;
+                            break;
+                        }
+                    }
+                }
+                result.put(strings[0], arr);
+            }
+
+        } catch (IOException | JsonSyntaxException | NoSuchMethodException | IllegalAccessException |
+                 InvocationTargetException e) {
+            System.err.println("Error while loading vital resource!\n" + e.getMessage());
+            System.exit(1);
+        }
 
         return result;
     }
